@@ -50,8 +50,13 @@ public class Start {
     public void start() throws Exception {
         generateData();
 
-        Spark.port(8123);
-        Spark.secure("certs/localhost-serverkeystore", "changeit", null, null);
+
+        final String keystoreFile = System.getProperty("keystore");
+        final String keystorePassword = System.getProperty("keystorePassword");
+        final int port = Integer.valueOf(System.getProperty("port"));
+
+        Spark.port(port);
+        Spark.secure(keystoreFile, keystorePassword, null, null);
 
         final JsonResponseTransformer responseTransformer = repo.getBean(JsonResponseTransformer.class);
 

@@ -1,0 +1,1 @@
+java -Dport=8123 -Dkeystore="certs/localhost-serverkeystore" -DkeystorePassword=changeit -jar server/target/server-1.0-SNAPSHOT-assembly/server-1.0-SNAPSHOT-launcher.jar
