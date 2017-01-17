@@ -3,17 +3,22 @@ package de.tse.example.sparkhibernatebeanrepository.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tinosteinort.beanrepository.BeanRepository;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.CreateDataRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.functional.DeleteDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.GetDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputInfoQueryService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.UserService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.UserBO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
+import de.tse.example.sparkhibernatebeanrepository.server.technical.JsonContentTypeFilter;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.JsonResponseTransformer;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.ContextExecutor;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.LoginDelegateRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.MyExceptionHandler;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.ObjectMapperFactory;
+import de.tse.example.sparkhibernatebeanrepository.server.technical.DbService;
+import de.tse.example.sparkhibernatebeanrepository.server.technical.RequestLogger;
+import de.tse.example.sparkhibernatebeanrepository.server.technical.ResponseLogger;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.SessionFactoryFactory;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.TransactionDelegateRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.TransactionExecutor;
@@ -28,18 +33,23 @@ public class Start {
 
     public Start() {
         this.repo = new BeanRepository.BeanRepositoryBuilder()
-                .singleton(InputService.class, InputService::new)
+                .singleton(DbService.class, DbService::new, SessionFactory.class)
+                .singleton(InputService.class, InputService::new, DbService.class)
                 .singleton(CreateDataRoute.class, CreateDataRoute::new)
                 .singleton(GetDataRoute.class, GetDataRoute::new)
+                .singleton(DeleteDataRoute.class, DeleteDataRoute::new)
                 .singletonFactory(SessionFactory.class, SessionFactoryFactory::new)
                 .singleton(TransactionExecutor.class, TransactionExecutor::new)
                 .singleton(ContextExecutor.class, ContextExecutor::new)
                 .singleton(UserFilterExecutor.class, UserFilterExecutor::new)
-                .singleton(UserService.class, UserService::new)
+                .singleton(UserService.class, UserService::new, DbService.class)
                 .singleton(InputInfoQueryService.class, InputInfoQueryService::new)
                 .singleton(MyExceptionHandler.class, MyExceptionHandler::new)
                 .singletonFactory(ObjectMapper.class, ObjectMapperFactory::new)
                 .singleton(JsonResponseTransformer.class, JsonResponseTransformer::new)
+                .singleton(JsonContentTypeFilter.class, JsonContentTypeFilter::new)
+                .singleton(RequestLogger.class, RequestLogger::new)
+                .singleton(ResponseLogger.class, ResponseLogger::new)
                 .build();
     }
 
@@ -60,8 +70,13 @@ public class Start {
 
         final JsonResponseTransformer responseTransformer = repo.getBean(JsonResponseTransformer.class);
 
+        Spark.before(repo.getBean(RequestLogger.class));
+        Spark.after(repo.getBean(ResponseLogger.class));
+
         Spark.get("/data", withTransactionAndUser(GetDataRoute.class), responseTransformer);
         Spark.post("/data", withTransactionAndUser(CreateDataRoute.class), responseTransformer);
+        Spark.delete("/data/:id", withTransactionAndUser(DeleteDataRoute.class), responseTransformer);
+        Spark.after("/data", repo.getBean(JsonContentTypeFilter.class));
         Spark.exception(Exception.class, repo.getBean(MyExceptionHandler.class));
     }
 

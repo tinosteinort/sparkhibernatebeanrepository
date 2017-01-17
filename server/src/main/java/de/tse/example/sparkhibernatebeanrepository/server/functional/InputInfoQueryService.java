@@ -23,6 +23,7 @@ public class InputInfoQueryService {
 
     public InputInfoTO map(final SavedInputBO savedInput) {
         final InputInfoTO info = new InputInfoTO();
+        info.setId(savedInput.getId());
         info.setData(savedInput.getData());
         info.setCreated(savedInput.getCreated());
         info.setOwner(savedInput.getOwner());

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <top>
+                <HBox>
+                    <TextField fx:id="inputField" onAction="#createData" />
+                    <Button text="Senden" onAction="#createData" />
+                    <Button text="Entfernen" onAction="#deleteData" />
+                    <Button text="Aktualisieren" onAction="#init" />
+                </HBox>
+            </top>
+            <center>
+                <TableView fx:id="table">
+                    <columns>
+                        <TableColumn text="Data" fx:id="dataColumn" />
+                        <TableColumn text="Erstellt" fx:id="createdColumn" prefWidth="200" />
+                    </columns>
+                </TableView>
+            </center>
+        </BorderPane>
+    </center>
+</BorderPane>

@@ -5,6 +5,11 @@ import com.github.tinosteinort.beanrepository.BeanRepository;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoListTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoTO;
+import de.tse.example.sparkhibernatebeanrepository.client.base.CredentialProvider;
+import de.tse.example.sparkhibernatebeanrepository.client.base.HttpClientTestFactory;
+import de.tse.example.sparkhibernatebeanrepository.client.base.HttpService;
+import de.tse.example.sparkhibernatebeanrepository.client.base.ObjectMapperTestFactory;
+import de.tse.example.sparkhibernatebeanrepository.client.ServiceClient;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,8 +28,11 @@ public class TestClient {
         repo = new BeanRepository.BeanRepositoryBuilder()
                 .singletonFactory(ObjectMapper.class, ObjectMapperTestFactory::new)
                 .singletonFactory(CloseableHttpClient.class, HttpClientTestFactory::new)
-                .singleton(ServiceClient.class, ServiceClient::new)
+                .singleton(ServiceClient.class, ServiceClient::new, HttpService.class, CredentialProvider.class)
+                .singleton(CredentialProvider.class, CredentialProvider::new)
                 .build();
+
+        repo.getBean(CredentialProvider.class).setName("tino");
     }
 
     @Test public void testGet() throws IOException {

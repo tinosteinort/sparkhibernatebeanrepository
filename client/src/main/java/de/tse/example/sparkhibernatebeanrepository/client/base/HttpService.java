@@ -1,12 +1,9 @@
-package client;
+package de.tse.example.sparkhibernatebeanrepository.client.base;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tinosteinort.beanrepository.BeanAccessor;
-import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
-import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoListTO;
-import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoTO;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -15,17 +12,17 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 
-public class ServiceClient {
+public class HttpService {
 
     private final CloseableHttpClient httpClient;
     private final ObjectMapper objectMapper;
 
-    public ServiceClient(final BeanAccessor beans) {
-        this.httpClient = beans.getBean(CloseableHttpClient.class);
-        this.objectMapper = beans.getBean(ObjectMapper.class);
+    public HttpService(final CloseableHttpClient httpClient, final ObjectMapper objectMapper) {
+        this.httpClient = httpClient;
+        this.objectMapper = objectMapper;
     }
 
-    private <T> T get(final String url, final Class<T> returnClass) throws IOException {
+    public <T> T get(final String url, final Class<T> returnClass) throws IOException {
         final HttpGet get = new HttpGet(url);
 
         try (final CloseableHttpResponse response = httpClient.execute(get)) {
@@ -54,11 +51,13 @@ public class ServiceClient {
         }
     }
 
-    public InputInfoListTO getInputInfos() throws IOException {
-        return get("https://localhost:8123/data?name=tino", InputInfoListTO.class);
-    }
+    public <P> void delete(final String url, final P data) throws IOException {
+        final HttpDelete delete = new HttpDelete(url);
 
-    public InputInfoTO create(final CreateInputTO input) throws IOException {
-        return post("https://localhost:8123/data?name=tino", input, InputInfoTO.class);
+        try (final CloseableHttpResponse response = httpClient.execute(delete)) {
+
+            final HttpEntity entity = response.getEntity();
+            EntityUtils.consume(entity);
+        }
     }
 }

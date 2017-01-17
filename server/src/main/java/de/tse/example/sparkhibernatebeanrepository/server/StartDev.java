@@ -1,6 +1,6 @@
 package de.tse.example.sparkhibernatebeanrepository.server;
 
-public class StertDev {
+public class StartDev {
 
     public static void main(String[] args) throws Exception {
 

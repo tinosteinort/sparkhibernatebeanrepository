@@ -1,18 +1,18 @@
 package de.tse.example.sparkhibernatebeanrepository.server.functional;
 
-import com.github.tinosteinort.beanrepository.BeanAccessor;
-import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.SavedInputBO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
+import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.SavedInputBO;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.DbService;
-import org.hibernate.query.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class InputService extends DbService {
+public class InputService {
 
-    public InputService(final BeanAccessor beans) {
-        super(beans);
+    private final DbService dbService;
+
+    public InputService(final DbService dbService) {
+        this.dbService = dbService;
     }
 
     public SavedInputBO create(final CreateInputTO input, final String owner) {
@@ -21,13 +21,20 @@ public class InputService extends DbService {
         savedInput.setCreated(LocalDateTime.now());
         savedInput.setData(input.getInput());
 
-        getSession().save(savedInput);
+        dbService.save(savedInput);
 
         return savedInput;
     }
 
     public List<SavedInputBO> listAll() {
-        final Query query = getSession().createQuery("FROM SavedInputBO");
-        return query.list();
+        return dbService.list("FROM SavedInputBO");
+    }
+
+    public SavedInputBO load(final long id) {
+        return dbService.loadById(SavedInputBO.class, id);
+    }
+
+    public void delete(final SavedInputBO saveInput) {
+        dbService.delete(saveInput);
     }
 }

@@ -1,4 +1,4 @@
-package client;
+package de.tse.example.sparkhibernatebeanrepository.client.base;
 
 import com.github.tinosteinort.beanrepository.Factory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -17,7 +17,7 @@ public class HttpClientTestFactory implements Factory<CloseableHttpClient> {
         final SSLContext sslcontext;
         try {
             sslcontext = SSLContexts.custom()
-                    .loadTrustMaterial(new File("../certs/localhost-serverkeystore"), "changeit".toCharArray(), new TrustSelfSignedStrategy())
+                    .loadTrustMaterial(new File("certs/localhost-serverkeystore"), "changeit".toCharArray(), new TrustSelfSignedStrategy())
                     .build();
         }
         catch (Exception ex) {
