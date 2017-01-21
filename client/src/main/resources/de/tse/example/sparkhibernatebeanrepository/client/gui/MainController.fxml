@@ -14,7 +14,6 @@
                     <TextField fx:id="inputField" onAction="#createData" />
                     <Button text="Senden" onAction="#createData" />
                     <Button text="Entfernen" onAction="#deleteData" />
-                    <Button text="Aktualisieren" onAction="#init" />
                 </HBox>
             </top>
             <center>
