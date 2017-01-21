@@ -30,6 +30,7 @@ public class TestClient {
                 .singletonFactory(CloseableHttpClient.class, HttpClientTestFactory::new)
                 .singleton(ServiceClient.class, ServiceClient::new, HttpService.class, CredentialProvider.class)
                 .singleton(CredentialProvider.class, CredentialProvider::new)
+                .singleton(HttpService.class, HttpService::new, CloseableHttpClient.class, ObjectMapper.class)
                 .build();
 
         repo.getBean(CredentialProvider.class).setName("tino");
