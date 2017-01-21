@@ -5,10 +5,7 @@ import com.github.tinosteinort.beanrepository.BeanRepository;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoListTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoTO;
-import de.tse.example.sparkhibernatebeanrepository.client.base.CredentialProvider;
-import de.tse.example.sparkhibernatebeanrepository.client.base.HttpClientTestFactory;
-import de.tse.example.sparkhibernatebeanrepository.client.base.HttpService;
-import de.tse.example.sparkhibernatebeanrepository.client.base.ObjectMapperTestFactory;
+import de.tse.example.sparkhibernatebeanrepository.client.base.*;
 import de.tse.example.sparkhibernatebeanrepository.client.ServiceClient;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Before;
@@ -21,13 +18,17 @@ import java.io.IOException;
  */
 public class TestClient {
 
-
     private BeanRepository repo;
 
     @Before public void setUp() {
+        final Configuration config = new Configuration();
+        config.setTrustStore("../certs/localhost-serverkeystore");
+        config.setTrustStorePassword("changeit".toCharArray());
+
         repo = new BeanRepository.BeanRepositoryBuilder()
+                .instance(config)
                 .singletonFactory(ObjectMapper.class, ObjectMapperTestFactory::new)
-                .singletonFactory(CloseableHttpClient.class, HttpClientTestFactory::new)
+                .singletonFactory(CloseableHttpClient.class, HttpClientTestFactory::new, Configuration.class)
                 .singleton(ServiceClient.class, ServiceClient::new, HttpService.class, CredentialProvider.class)
                 .singleton(CredentialProvider.class, CredentialProvider::new)
                 .singleton(HttpService.class, HttpService::new, CloseableHttpClient.class, ObjectMapper.class)

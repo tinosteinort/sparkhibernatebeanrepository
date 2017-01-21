@@ -12,12 +12,20 @@ import java.io.File;
 
 public class HttpClientTestFactory implements Factory<CloseableHttpClient> {
 
+    private final Configuration configuration;
+
+    public HttpClientTestFactory(final Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @Override public CloseableHttpClient createInstance() {
 
         final SSLContext sslcontext;
         try {
             sslcontext = SSLContexts.custom()
-                    .loadTrustMaterial(new File("certs/localhost-serverkeystore"), "changeit".toCharArray(), new TrustSelfSignedStrategy())
+                    .loadTrustMaterial(new File(configuration.getTrustStore()),
+                            configuration.getTrustStorePassword(),
+                            new TrustSelfSignedStrategy())
                     .build();
         }
         catch (Exception ex) {
