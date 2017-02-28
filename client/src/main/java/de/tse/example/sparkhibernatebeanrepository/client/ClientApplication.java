@@ -22,6 +22,7 @@ public class ClientApplication extends Application {
         final Configuration config = new Configuration();
         config.setTrustStore("certs/localhost-serverkeystore");
         config.setTrustStorePassword("changeit".toCharArray());
+        config.setBaseUrl("https://localhost:8123");
 
         final BeanRepository repo = new BeanRepository.BeanRepositoryBuilder()
                 .instance(primaryStage)
@@ -29,14 +30,13 @@ public class ClientApplication extends Application {
                 .singleton(LoginController.class, LoginController::new)
                 .singleton(MainController.class, MainController::new, GuiExecutor.class, ServiceClient.class)
                 .singleton(CredentialProvider.class, CredentialProvider::new)
-                .singletonFactory(ObjectMapper.class, ObjectMapperTestFactory::new)
-                .singletonFactory(CloseableHttpClient.class, HttpClientTestFactory::new, Configuration.class)
+                .singletonFactory(ObjectMapper.class, ObjectMapperFactory::new)
+                .singletonFactory(CloseableHttpClient.class, HttpClientFactory::new, Configuration.class)
                 .singleton(HttpService.class, HttpService::new, CloseableHttpClient.class, ObjectMapper.class)
-                .singleton(ServiceClient.class, ServiceClient::new, HttpService.class, CredentialProvider.class)
+                .singleton(LoginService.class, LoginService::new)
+                .singleton(ServiceClient.class, ServiceClient::new)
                 .singleton(GuiExecutor.class, GuiExecutor::new)
                 .build();
-
-        repo.getBean(ServiceClient.class);
 
         final LoginController controller = repo.getBean(LoginController.class);
 

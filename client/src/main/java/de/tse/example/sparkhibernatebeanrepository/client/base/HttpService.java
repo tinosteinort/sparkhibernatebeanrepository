@@ -2,6 +2,7 @@ package de.tse.example.sparkhibernatebeanrepository.client.base;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -26,6 +27,7 @@ public class HttpService {
         final HttpGet get = new HttpGet(url);
 
         try (final CloseableHttpResponse response = httpClient.execute(get)) {
+            validateStatusCode(response);
 
             final HttpEntity entity = response.getEntity();
 
@@ -42,6 +44,7 @@ public class HttpService {
         post.setEntity(postData);
 
         try (final CloseableHttpResponse response = httpClient.execute(post)) {
+            validateStatusCode(response);
 
             final HttpEntity entity = response.getEntity();
 
@@ -51,13 +54,22 @@ public class HttpService {
         }
     }
 
-    public <P> void delete(final String url, final P data) throws IOException {
+    public void delete(final String url) throws IOException {
         final HttpDelete delete = new HttpDelete(url);
 
         try (final CloseableHttpResponse response = httpClient.execute(delete)) {
+            validateStatusCode(response);
 
             final HttpEntity entity = response.getEntity();
             EntityUtils.consume(entity);
+        }
+    }
+
+    private void validateStatusCode(final CloseableHttpResponse response) throws IOException {
+        if (response.getStatusLine().getStatusCode() < HttpStatus.SC_OK
+                || response.getStatusLine().getStatusCode() >= HttpStatus.SC_MULTIPLE_CHOICES) {
+
+            throw new RuntimeException(EntityUtils.toString(response.getEntity()));
         }
     }
 }

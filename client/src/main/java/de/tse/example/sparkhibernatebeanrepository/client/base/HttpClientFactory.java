@@ -10,11 +10,11 @@ import org.apache.http.ssl.SSLContexts;
 import javax.net.ssl.SSLContext;
 import java.io.File;
 
-public class HttpClientTestFactory implements Factory<CloseableHttpClient> {
+public class HttpClientFactory implements Factory<CloseableHttpClient> {
 
     private final Configuration configuration;
 
-    public HttpClientTestFactory(final Configuration configuration) {
+    public HttpClientFactory(final Configuration configuration) {
         this.configuration = configuration;
     }
 

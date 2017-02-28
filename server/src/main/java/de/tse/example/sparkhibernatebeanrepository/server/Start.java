@@ -7,6 +7,7 @@ import de.tse.example.sparkhibernatebeanrepository.server.functional.DeleteDataR
 import de.tse.example.sparkhibernatebeanrepository.server.functional.GetDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputInfoQueryService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputService;
+import de.tse.example.sparkhibernatebeanrepository.server.functional.LoginRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.UserService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.UserBO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
@@ -18,6 +19,7 @@ import de.tse.example.sparkhibernatebeanrepository.server.technical.MyExceptionH
 import de.tse.example.sparkhibernatebeanrepository.server.technical.ObjectMapperFactory;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.DbService;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.RequestLogger;
+import de.tse.example.sparkhibernatebeanrepository.server.technical.RequestUnmarshaller;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.ResponseLogger;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.SessionFactoryFactory;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.TransactionDelegateRoute;
@@ -35,6 +37,7 @@ public class Start {
         this.repo = new BeanRepository.BeanRepositoryBuilder()
                 .singleton(DbService.class, DbService::new, SessionFactory.class)
                 .singleton(InputService.class, InputService::new, DbService.class)
+                .singleton(LoginRoute.class, LoginRoute::new, UserService.class, RequestUnmarshaller.class)
                 .singleton(CreateDataRoute.class, CreateDataRoute::new)
                 .singleton(GetDataRoute.class, GetDataRoute::new)
                 .singleton(DeleteDataRoute.class, DeleteDataRoute::new)
@@ -46,6 +49,7 @@ public class Start {
                 .singleton(InputInfoQueryService.class, InputInfoQueryService::new)
                 .singleton(MyExceptionHandler.class, MyExceptionHandler::new)
                 .singletonFactory(ObjectMapper.class, ObjectMapperFactory::new)
+                .singleton(RequestUnmarshaller.class, RequestUnmarshaller::new, ObjectMapper.class)
                 .singleton(JsonResponseTransformer.class, JsonResponseTransformer::new)
                 .singleton(JsonContentTypeFilter.class, JsonContentTypeFilter::new)
                 .singleton(RequestLogger.class, RequestLogger::new)
@@ -73,9 +77,11 @@ public class Start {
         Spark.before(repo.getBean(RequestLogger.class));
         Spark.after(repo.getBean(ResponseLogger.class));
 
+        Spark.post("/login", withTransaction(LoginRoute.class), responseTransformer);
         Spark.get("/data", withTransactionAndUser(GetDataRoute.class), responseTransformer);
         Spark.post("/data", withTransactionAndUser(CreateDataRoute.class), responseTransformer);
         Spark.delete("/data/:id", withTransactionAndUser(DeleteDataRoute.class), responseTransformer);
+        Spark.after("/login", repo.getBean(JsonContentTypeFilter.class));
         Spark.after("/data", repo.getBean(JsonContentTypeFilter.class));
         Spark.exception(Exception.class, repo.getBean(MyExceptionHandler.class));
     }
@@ -118,5 +124,10 @@ public class Start {
         final T route = repo.getBean(routeClass);
         final LoginDelegateRoute loginRoute = repo.getBean((beans) -> new LoginDelegateRoute(beans, route));
         return repo.getBean((beans) -> new TransactionDelegateRoute(beans, loginRoute));
+    }
+
+    public <T extends Route> Route withTransaction(final Class<T> routeClass) {
+        final T route = repo.getBean(routeClass);
+        return repo.getBean((beans) -> new TransactionDelegateRoute(beans, route));
     }
 }

@@ -1,5 +1,8 @@
 package de.tse.example.sparkhibernatebeanrepository.client.base;
 
+/**
+ * TODO check if this class is needed anymore
+ */
 public class CredentialProvider {
 
     private String name;

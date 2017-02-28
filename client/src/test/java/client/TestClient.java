@@ -5,6 +5,7 @@ import com.github.tinosteinort.beanrepository.BeanRepository;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoListTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoTO;
+import de.tse.example.sparkhibernatebeanrepository.client.LoginService;
 import de.tse.example.sparkhibernatebeanrepository.client.base.*;
 import de.tse.example.sparkhibernatebeanrepository.client.ServiceClient;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -24,17 +25,19 @@ public class TestClient {
         final Configuration config = new Configuration();
         config.setTrustStore("../certs/localhost-serverkeystore");
         config.setTrustStorePassword("changeit".toCharArray());
+        config.setBaseUrl("https://localhost:8123");
 
         repo = new BeanRepository.BeanRepositoryBuilder()
                 .instance(config)
-                .singletonFactory(ObjectMapper.class, ObjectMapperTestFactory::new)
-                .singletonFactory(CloseableHttpClient.class, HttpClientTestFactory::new, Configuration.class)
-                .singleton(ServiceClient.class, ServiceClient::new, HttpService.class, CredentialProvider.class)
+                .singletonFactory(ObjectMapper.class, ObjectMapperFactory::new)
+                .singletonFactory(CloseableHttpClient.class, HttpClientFactory::new, Configuration.class)
+                .singleton(LoginService.class, LoginService::new)
+                .singleton(ServiceClient.class, ServiceClient::new)
                 .singleton(CredentialProvider.class, CredentialProvider::new)
                 .singleton(HttpService.class, HttpService::new, CloseableHttpClient.class, ObjectMapper.class)
                 .build();
 
-        repo.getBean(CredentialProvider.class).setName("tino");
+        repo.getBean(LoginService.class).login("tino");
     }
 
     @Test public void testGet() throws IOException {

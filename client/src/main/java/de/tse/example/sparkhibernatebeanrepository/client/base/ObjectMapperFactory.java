@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tinosteinort.beanrepository.Factory;
 
-public class ObjectMapperTestFactory implements Factory<ObjectMapper> {
+public class ObjectMapperFactory implements Factory<ObjectMapper> {
 
     @Override public ObjectMapper createInstance() {
         final ObjectMapper mapper = new ObjectMapper();

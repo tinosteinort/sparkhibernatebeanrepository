@@ -1,26 +1,27 @@
 package de.tse.example.sparkhibernatebeanrepository.client;
 
+import com.github.tinosteinort.beanrepository.BeanAccessor;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoListTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoTO;
-import de.tse.example.sparkhibernatebeanrepository.client.base.CredentialProvider;
 import de.tse.example.sparkhibernatebeanrepository.client.base.HttpService;
+import de.tse.example.sparkhibernatebeanrepository.client.base.ServiceUrlProvider;
 
 import java.io.IOException;
 
 public class ServiceClient {
 
     private final HttpService httpService;
-    private final CredentialProvider credentialProvider;
+    private final ServiceUrlProvider urlProvider;
 
-    public ServiceClient(final HttpService httpService, final CredentialProvider credentialProvider) {
-        this.httpService = httpService;
-        this.credentialProvider = credentialProvider;
+    public ServiceClient(final BeanAccessor beans) {
+        this.httpService = beans.getBean(HttpService.class);
+        this.urlProvider = beans.getBean(accessor -> new ServiceUrlProvider(accessor, "data"));
     }
 
     public InputInfoListTO getInputInfos() {
         try {
-            return httpService.get("https://localhost:8123/data?name=" + credentialProvider.getName(), InputInfoListTO.class);
+            return httpService.get(urlProvider.provide(), InputInfoListTO.class);
         }
         catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -29,7 +30,7 @@ public class ServiceClient {
 
     public InputInfoTO create(final CreateInputTO input) {
         try {
-            return httpService.post("https://localhost:8123/data?name=" + credentialProvider.getName(), input, InputInfoTO.class);
+            return httpService.post(urlProvider.provide(), input, InputInfoTO.class);
         }
         catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -38,7 +39,7 @@ public class ServiceClient {
 
     public void delete(final InputInfoTO input) {
         try {
-            httpService.delete("https://localhost:8123/data/" + input.getId() + "?name=" + credentialProvider.getName(), input);
+            httpService.delete(urlProvider.provide(String.valueOf(input.getId())));
         }
         catch (IOException ex) {
             throw new RuntimeException(ex);
