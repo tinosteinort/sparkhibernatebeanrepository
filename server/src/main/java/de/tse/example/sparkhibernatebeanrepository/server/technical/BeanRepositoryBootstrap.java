@@ -8,6 +8,7 @@ import de.tse.example.sparkhibernatebeanrepository.server.functional.GetDataRout
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputInfoQueryService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.LoginRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.functional.SearchDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.UserService;
 import org.hibernate.SessionFactory;
 
@@ -21,6 +22,7 @@ public class BeanRepositoryBootstrap {
                 .singleton(LoginRoute.class, LoginRoute::new, UserService.class, RequestUnmarshaller.class)
                 .singleton(CreateDataRoute.class, CreateDataRoute::new)
                 .singleton(GetDataRoute.class, GetDataRoute::new)
+                .singleton(SearchDataRoute.class, SearchDataRoute::new)
                 .singleton(DeleteDataRoute.class, DeleteDataRoute::new)
                 .singletonFactory(SessionFactory.class, SessionFactoryFactory::new)
                 .singleton(TransactionExecutor.class, TransactionExecutor::new)

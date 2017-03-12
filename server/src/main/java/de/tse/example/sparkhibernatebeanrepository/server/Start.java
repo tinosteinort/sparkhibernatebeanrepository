@@ -7,6 +7,7 @@ import de.tse.example.sparkhibernatebeanrepository.server.functional.DeleteDataR
 import de.tse.example.sparkhibernatebeanrepository.server.functional.GetDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.LoginRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.functional.SearchDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.UserService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.UserBO;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.BeanRepositoryBootstrap;
@@ -21,6 +22,9 @@ import de.tse.example.sparkhibernatebeanrepository.server.technical.TransactionD
 import de.tse.example.sparkhibernatebeanrepository.server.technical.TransactionExecutor;
 import spark.Route;
 import spark.Spark;
+
+import static de.tse.example.sparkhibernatebeanrepository.server.functional.DeleteDataRoute.DELETE_ID;
+import static de.tse.example.sparkhibernatebeanrepository.server.functional.SearchDataRoute.SEARCH_VALUE;
 
 public class Start {
 
@@ -52,8 +56,9 @@ public class Start {
 
         Spark.post("/login", withTransaction(LoginRoute.class), responseTransformer);
         Spark.get("/data", withTransactionAndUser(GetDataRoute.class), responseTransformer);
+        Spark.get("/data/" + SEARCH_VALUE, withTransactionAndUser(SearchDataRoute.class), responseTransformer);
         Spark.post("/data", withTransactionAndUser(CreateDataRoute.class), responseTransformer);
-        Spark.delete("/data/:id", withTransactionAndUser(DeleteDataRoute.class), responseTransformer);
+        Spark.delete("/data/" + DELETE_ID, withTransactionAndUser(DeleteDataRoute.class), responseTransformer);
 
         Spark.after("/login", repo.getBean(JsonContentTypeFilter.class));
         Spark.after("/data", repo.getBean(JsonContentTypeFilter.class));

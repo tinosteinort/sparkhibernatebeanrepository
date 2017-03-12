@@ -26,11 +26,13 @@ public class MainController extends FxmlController implements Initializable {
     private final ServiceClient serviceClient;
 
     @FXML private TextField inputField;
+    @FXML private TextField searchField;
     @FXML private TableView<InputInfoTO> table;
     @FXML private TableColumn<InputInfoTO, String> dataColumn;
     @FXML private TableColumn<InputInfoTO, LocalDateTime> createdColumn;
 
     private final StringProperty inputData = new SimpleStringProperty();
+    private final StringProperty searchValue = new SimpleStringProperty();
     private final ObservableList<InputInfoTO> infos = FXCollections.observableArrayList();
 
     public MainController(final GuiExecutor guiExecutor, final ServiceClient serviceClient) {
@@ -44,6 +46,7 @@ public class MainController extends FxmlController implements Initializable {
 
     @Override public void initialize(final URL location, final ResourceBundle resources) {
         inputData.bindBidirectional(inputField.textProperty());
+        searchValue.bindBidirectional(searchField.textProperty());
 
         dataColumn.setCellValueFactory(param -> param.getValue().dataProperty());
         createdColumn.setCellValueFactory(param -> param.getValue().createdProperty());
@@ -82,7 +85,33 @@ public class MainController extends FxmlController implements Initializable {
         }
     }
 
+    @FXML public void searchData() {
+        final String searchText = searchValue.get();
+
+        guiExecutor.execute(
+                () -> {
+                    if ("".equals(searchText) || searchText == null) {
+                        return serviceClient.getInputInfos();
+                    }
+                    return serviceClient.findInputInfos(searchText);
+                },
+                (InputInfoListTO searchResult) -> {
+                    infos.clear();
+                    infos.addAll(searchResult.getInputInfos());
+                }
+        );
+    }
+
+    @FXML public void clearSearch() {
+        searchField.setText("");
+        loadAllData();
+    }
+
     public void init() {
+        loadAllData();
+    }
+
+    private void loadAllData() {
         guiExecutor.execute(
                 serviceClient::getInputInfos,
                 (InputInfoListTO inputInfos) -> {

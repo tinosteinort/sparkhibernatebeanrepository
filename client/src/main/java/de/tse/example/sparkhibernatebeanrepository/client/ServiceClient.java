@@ -28,6 +28,15 @@ public class ServiceClient {
         }
     }
 
+    public InputInfoListTO findInputInfos(final String searchValue) {
+        try {
+            return httpService.get(urlProvider.provide(searchValue), InputInfoListTO.class);
+        }
+        catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     public InputInfoTO create(final CreateInputTO input) {
         try {
             return httpService.post(urlProvider.provide(), input, InputInfoTO.class);

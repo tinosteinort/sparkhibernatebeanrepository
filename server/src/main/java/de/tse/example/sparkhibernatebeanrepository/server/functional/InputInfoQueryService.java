@@ -21,6 +21,14 @@ public class InputInfoQueryService {
         return inputInfos;
     }
 
+    public InputInfoListTO findAllContaining(final String searchValue) {
+        final InputInfoListTO searchResult = new InputInfoListTO();
+        for (SavedInputBO savedInput : inputService.findAllContaining(searchValue)) {
+            searchResult.getInputInfos().add(map(savedInput));
+        }
+        return searchResult;
+    }
+
     public InputInfoTO map(final SavedInputBO savedInput) {
         final InputInfoTO info = new InputInfoTO();
         info.setId(savedInput.getId());

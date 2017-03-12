@@ -9,6 +9,7 @@ import de.tse.example.sparkhibernatebeanrepository.client.LoginService;
 import de.tse.example.sparkhibernatebeanrepository.client.base.*;
 import de.tse.example.sparkhibernatebeanrepository.client.ServiceClient;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,5 +58,23 @@ public class TestClient {
         final CreateInputTO newInput = new CreateInputTO("TiTaTest");
         final InputInfoTO createdInput = service.create(newInput);
         System.out.println(createdInput);
+    }
+
+    @Test public void testDelete() throws Exception {
+
+        final ServiceClient service = repo.getBean(ServiceClient.class);
+
+        final int initialDataCount = service.getInputInfos().getInputInfos().size();
+
+        final CreateInputTO newData = new CreateInputTO("DeletionTest");
+        final InputInfoTO createdData = service.create(newData);
+
+        final int dataCountAfterCreate = service.getInputInfos().getInputInfos().size();
+        Assert.assertEquals(initialDataCount + 1, dataCountAfterCreate);
+
+        service.delete(createdData);
+
+        final int dataCountAfterDelete = service.getInputInfos().getInputInfos().size();
+        Assert.assertEquals(initialDataCount, dataCountAfterDelete);
     }
 }

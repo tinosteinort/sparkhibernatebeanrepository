@@ -8,6 +8,8 @@ import spark.Route;
 
 public class DeleteDataRoute implements Route {
 
+    public static final String DELETE_ID = ":id";
+
     private final InputService inputService;
 
     public DeleteDataRoute(final BeanAccessor beans) {
@@ -15,7 +17,7 @@ public class DeleteDataRoute implements Route {
     }
 
     @Override public Object handle(final Request request, final Response response) throws Exception {
-        final long id = Long.valueOf(request.params(":id"));
+        final long id = Long.valueOf(request.params(DELETE_ID));
 
         final SavedInputBO load = inputService.load(id);
         if (load != null) {

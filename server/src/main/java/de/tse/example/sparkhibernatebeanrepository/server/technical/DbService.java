@@ -35,6 +35,10 @@ public class DbService {
         }
     }
 
+    public <T> List<T> list(final Query query) {
+        return query.list();
+    }
+
     public <T> T loadById(final Class<T> cls, final long id) {
         final Query query = createQuery("from " + cls.getSimpleName() + " where id=:ID");
         query.setParameter("ID", id);
