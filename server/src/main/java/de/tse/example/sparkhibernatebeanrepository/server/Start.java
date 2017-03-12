@@ -1,31 +1,24 @@
 package de.tse.example.sparkhibernatebeanrepository.server;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tinosteinort.beanrepository.BeanRepository;
+import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.CreateDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.DeleteDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.GetDataRoute;
-import de.tse.example.sparkhibernatebeanrepository.server.functional.InputInfoQueryService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.LoginRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.UserService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.UserBO;
-import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
+import de.tse.example.sparkhibernatebeanrepository.server.technical.BeanRepositoryBootstrap;
+import de.tse.example.sparkhibernatebeanrepository.server.technical.ContextExecutor;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.JsonContentTypeFilter;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.JsonResponseTransformer;
-import de.tse.example.sparkhibernatebeanrepository.server.technical.ContextExecutor;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.LoginValidationRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.MyExceptionHandler;
-import de.tse.example.sparkhibernatebeanrepository.server.technical.ObjectMapperFactory;
-import de.tse.example.sparkhibernatebeanrepository.server.technical.DbService;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.RequestLogger;
-import de.tse.example.sparkhibernatebeanrepository.server.technical.RequestUnmarshaller;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.ResponseLogger;
-import de.tse.example.sparkhibernatebeanrepository.server.technical.SessionFactoryFactory;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.TransactionDelegateRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.TransactionExecutor;
-import de.tse.example.sparkhibernatebeanrepository.server.technical.UserFilterExecutor;
-import org.hibernate.SessionFactory;
 import spark.Route;
 import spark.Spark;
 
@@ -34,27 +27,7 @@ public class Start {
     private final BeanRepository repo;
 
     public Start() {
-        this.repo = new BeanRepository.BeanRepositoryBuilder()
-                .singleton(DbService.class, DbService::new, SessionFactory.class)
-                .singleton(InputService.class, InputService::new, DbService.class)
-                .singleton(LoginRoute.class, LoginRoute::new, UserService.class, RequestUnmarshaller.class)
-                .singleton(CreateDataRoute.class, CreateDataRoute::new)
-                .singleton(GetDataRoute.class, GetDataRoute::new)
-                .singleton(DeleteDataRoute.class, DeleteDataRoute::new)
-                .singletonFactory(SessionFactory.class, SessionFactoryFactory::new)
-                .singleton(TransactionExecutor.class, TransactionExecutor::new)
-                .singleton(ContextExecutor.class, ContextExecutor::new)
-                .singleton(UserFilterExecutor.class, UserFilterExecutor::new)
-                .singleton(UserService.class, UserService::new, DbService.class)
-                .singleton(InputInfoQueryService.class, InputInfoQueryService::new)
-                .singleton(MyExceptionHandler.class, MyExceptionHandler::new)
-                .singletonFactory(ObjectMapper.class, ObjectMapperFactory::new)
-                .singleton(RequestUnmarshaller.class, RequestUnmarshaller::new, ObjectMapper.class)
-                .singleton(JsonResponseTransformer.class, JsonResponseTransformer::new)
-                .singleton(JsonContentTypeFilter.class, JsonContentTypeFilter::new)
-                .singleton(RequestLogger.class, RequestLogger::new)
-                .singleton(ResponseLogger.class, ResponseLogger::new)
-                .build();
+        this.repo = new BeanRepositoryBootstrap().bootstrap();
     }
 
     public static void main(String[] args) throws Exception {
