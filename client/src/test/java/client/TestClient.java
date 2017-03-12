@@ -9,6 +9,8 @@ import de.tse.example.sparkhibernatebeanrepository.client.LoginService;
 import de.tse.example.sparkhibernatebeanrepository.client.base.*;
 import de.tse.example.sparkhibernatebeanrepository.client.ServiceClient;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,5 +78,23 @@ public class TestClient {
 
         final int dataCountAfterDelete = service.getInputInfos().getInputInfos().size();
         Assert.assertEquals(initialDataCount, dataCountAfterDelete);
+    }
+
+    @Test public void testFind() throws Exception {
+
+        final ServiceClient service = repo.getBean(ServiceClient.class);
+
+        final InputInfoTO item1 = service.create(new CreateInputTO("Item1"));
+        final InputInfoTO item11 = service.create(new CreateInputTO("item11"));
+        final InputInfoTO item2 = service.create(new CreateInputTO("Item2"));
+
+        final InputInfoListTO searchResult = service.findInputInfos("Item1");
+        Assert.assertEquals(2, searchResult.getInputInfos().size());
+        Assert.assertEquals("item11", searchResult.getInputInfos().get(0).getData());
+        Assert.assertEquals("Item1", searchResult.getInputInfos().get(1).getData());
+
+        service.delete(item1);
+        service.delete(item11);
+        service.delete(item2);
     }
 }
