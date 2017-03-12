@@ -66,7 +66,7 @@ public class MainController extends FxmlController implements Initializable {
         guiExecutor.execute(
                 () -> serviceClient.create(input),
                 (InputInfoTO createdInput) -> {
-                    infos.add(createdInput);
+                    infos.add(0, createdInput);
                     inputData.set(null);
                 });
     }

@@ -14,7 +14,7 @@ public class LoginService {
 
     public LoginService(final BeanAccessor beans) {
         this.httpService = beans.getBean(HttpService.class);
-        this.urlProvider = beans.getBean(accessor -> new ServiceUrlProvider(accessor, "login"));
+        this.urlProvider = beans.getPrototypeBean(ServiceUrlProvider::new, "login");
     }
 
     public AuthenticationStatus login(final String name) {

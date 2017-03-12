@@ -33,7 +33,6 @@ public class TestClient {
                 .singletonFactory(CloseableHttpClient.class, HttpClientFactory::new, Configuration.class)
                 .singleton(LoginService.class, LoginService::new)
                 .singleton(ServiceClient.class, ServiceClient::new)
-                .singleton(CredentialProvider.class, CredentialProvider::new)
                 .singleton(HttpService.class, HttpService::new, CloseableHttpClient.class, ObjectMapper.class)
                 .build();
 

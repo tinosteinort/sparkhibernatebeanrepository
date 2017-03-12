@@ -6,12 +6,12 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-public class LoginDelegateRoute implements Route {
+public class LoginValidationRoute implements Route {
 
     private final ContextExecutor contextExecutor;
     private final Route route;
 
-    public LoginDelegateRoute(final BeanAccessor beans, final Route route) {
+    public LoginValidationRoute(final BeanAccessor beans, final Route route) {
         this.contextExecutor = beans.getBean(ContextExecutor.class);
         this.route = route;
     }

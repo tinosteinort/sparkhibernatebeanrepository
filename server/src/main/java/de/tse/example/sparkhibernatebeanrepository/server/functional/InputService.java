@@ -27,7 +27,7 @@ public class InputService {
     }
 
     public List<SavedInputBO> listAll() {
-        return dbService.list("FROM SavedInputBO");
+        return dbService.list("FROM SavedInputBO ORDER BY created DESC");
     }
 
     public SavedInputBO load(final long id) {

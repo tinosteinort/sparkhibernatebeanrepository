@@ -14,7 +14,7 @@ import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.JsonContentTypeFilter;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.JsonResponseTransformer;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.ContextExecutor;
-import de.tse.example.sparkhibernatebeanrepository.server.technical.LoginDelegateRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.technical.LoginValidationRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.MyExceptionHandler;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.ObjectMapperFactory;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.DbService;
@@ -81,8 +81,10 @@ public class Start {
         Spark.get("/data", withTransactionAndUser(GetDataRoute.class), responseTransformer);
         Spark.post("/data", withTransactionAndUser(CreateDataRoute.class), responseTransformer);
         Spark.delete("/data/:id", withTransactionAndUser(DeleteDataRoute.class), responseTransformer);
+
         Spark.after("/login", repo.getBean(JsonContentTypeFilter.class));
         Spark.after("/data", repo.getBean(JsonContentTypeFilter.class));
+
         Spark.exception(Exception.class, repo.getBean(MyExceptionHandler.class));
     }
 
@@ -120,14 +122,14 @@ public class Start {
         }));
     }
 
-    public <T extends Route> Route withTransactionAndUser(final Class<T> routeClass) {
+    private <T extends Route> Route withTransactionAndUser(final Class<T> routeClass) {
         final T route = repo.getBean(routeClass);
-        final LoginDelegateRoute loginRoute = repo.getBean((beans) -> new LoginDelegateRoute(beans, route));
-        return repo.getBean((beans) -> new TransactionDelegateRoute(beans, loginRoute));
+        final LoginValidationRoute loginRoute = repo.getPrototypeBean(LoginValidationRoute::new, route);
+        return repo.getPrototypeBean(TransactionDelegateRoute::new, loginRoute);
     }
 
-    public <T extends Route> Route withTransaction(final Class<T> routeClass) {
+    private <T extends Route> Route withTransaction(final Class<T> routeClass) {
         final T route = repo.getBean(routeClass);
-        return repo.getBean((beans) -> new TransactionDelegateRoute(beans, route));
+        return repo.getPrototypeBean(TransactionDelegateRoute::new, route);
     }
 }

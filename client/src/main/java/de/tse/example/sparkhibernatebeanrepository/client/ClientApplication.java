@@ -29,7 +29,6 @@ public class ClientApplication extends Application {
                 .instance(config)
                 .singleton(LoginController.class, LoginController::new)
                 .singleton(MainController.class, MainController::new, GuiExecutor.class, ServiceClient.class)
-                .singleton(CredentialProvider.class, CredentialProvider::new)
                 .singletonFactory(ObjectMapper.class, ObjectMapperFactory::new)
                 .singletonFactory(CloseableHttpClient.class, HttpClientFactory::new, Configuration.class)
                 .singleton(HttpService.class, HttpService::new, CloseableHttpClient.class, ObjectMapper.class)

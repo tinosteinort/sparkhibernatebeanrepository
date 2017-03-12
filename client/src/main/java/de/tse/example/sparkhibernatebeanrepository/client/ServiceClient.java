@@ -16,7 +16,7 @@ public class ServiceClient {
 
     public ServiceClient(final BeanAccessor beans) {
         this.httpService = beans.getBean(HttpService.class);
-        this.urlProvider = beans.getBean(accessor -> new ServiceUrlProvider(accessor, "data"));
+        this.urlProvider = beans.getPrototypeBean(ServiceUrlProvider::new, "data");
     }
 
     public InputInfoListTO getInputInfos() {

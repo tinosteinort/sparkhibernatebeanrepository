@@ -3,7 +3,6 @@ package de.tse.example.sparkhibernatebeanrepository.client.gui;
 import com.github.tinosteinort.beanrepository.BeanAccessor;
 import de.tse.example.sparkhibernatebeanrepository.api.to.AuthenticationStatus;
 import de.tse.example.sparkhibernatebeanrepository.client.LoginService;
-import de.tse.example.sparkhibernatebeanrepository.client.base.CredentialProvider;
 import de.tse.example.sparkhibernatebeanrepository.client.base.FxmlController;
 import de.tse.example.sparkhibernatebeanrepository.client.base.GuiExecutor;
 import javafx.beans.property.SimpleStringProperty;
@@ -24,7 +23,6 @@ public class LoginController extends FxmlController implements Initializable {
 
     private final BeanAccessor beans;
     private final Stage stage;
-    private final CredentialProvider credentialProvider;
     private final GuiExecutor guiExecutor;
     private final LoginService loginService;
 
@@ -34,7 +32,6 @@ public class LoginController extends FxmlController implements Initializable {
     public LoginController(final BeanAccessor beans) {
         this.beans = beans;
         this.stage = beans.getBean(Stage.class);
-        this.credentialProvider = beans.getBean(CredentialProvider.class);
         this.guiExecutor = beans.getBean(GuiExecutor.class);
         this.loginService = beans.getBean(LoginService.class);
     }
@@ -45,7 +42,6 @@ public class LoginController extends FxmlController implements Initializable {
 
     @FXML public void doLogin() {
         if (nameField != null && !"".equals(name.get())) {
-            credentialProvider.setName(name.get());
 
             login(name.get(), (AuthenticationStatus status) -> {
                         switch (status) {
