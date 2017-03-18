@@ -1,6 +1,7 @@
 package de.tse.example.sparkhibernatebeanrepository.client.base;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -12,8 +13,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 public class HttpService {
+
+    private static final Charset CHARSET = Charsets.UTF_8;
 
     private final CloseableHttpClient httpClient;
     private final ObjectMapper objectMapper;
@@ -31,7 +35,7 @@ public class HttpService {
 
             final HttpEntity entity = response.getEntity();
 
-            final T data = objectMapper.readValue(EntityUtils.toString(entity), returnClass);
+            final T data = objectMapper.readValue(EntityUtils.toString(entity, CHARSET), returnClass);
             EntityUtils.consume(entity);
             return data;
         }
@@ -40,7 +44,9 @@ public class HttpService {
     public <R, P> R post(final String url, final P data, final Class<R> returnClass) throws IOException {
         final HttpPost post = new HttpPost(url);
 
-        final StringEntity postData = (data == null ? null : new StringEntity(objectMapper.writeValueAsString(data)));
+        final StringEntity postData = (data == null
+                                        ? null
+                                        : new StringEntity(objectMapper.writeValueAsString(data), CHARSET));
         post.setEntity(postData);
 
         try (final CloseableHttpResponse response = httpClient.execute(post)) {
@@ -48,7 +54,7 @@ public class HttpService {
 
             final HttpEntity entity = response.getEntity();
 
-            final R inputInfo = objectMapper.readValue(EntityUtils.toString(entity), returnClass);
+            final R inputInfo = objectMapper.readValue(EntityUtils.toString(entity, CHARSET), returnClass);
             EntityUtils.consume(entity);
             return inputInfo;
         }
