@@ -3,11 +3,17 @@ package de.tse.example.sparkhibernatebeanrepository.server.functional;
 import de.tse.example.sparkhibernatebeanrepository.api.to.AuthenticationStatus;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.UserBO;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.RequestUnmarshaller;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
 
 public class LoginRoute implements Route {
 
@@ -32,7 +38,21 @@ public class LoginRoute implements Route {
         }
 
         LOG.debug("User %s logged id", user.getName());
-        response.cookie(USER_ID, user.getName());
+        response.cookie(USER_ID, buildToken(user.getName()));
         return AuthenticationStatus.AUTHENTICATED;
+    }
+
+    private String buildToken(final String user) {
+
+        final SignatureAlgorithm algorithm = SignatureAlgorithm.HS256;
+
+        byte[] key = "MyKey".getBytes();
+        final Key secretKey = new SecretKeySpec(key, algorithm.getJcaName());
+
+        final JwtBuilder builder = Jwts.builder()
+                .setSubject(user)
+                .signWith(algorithm, secretKey);
+
+        return builder.compact();
     }
 }

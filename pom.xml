@@ -30,6 +30,7 @@
         <versions.jackson-databind>2.8.5</versions.jackson-databind>
         <version.maven-assembly-plugin>2.6</version.maven-assembly-plugin>
         <version.maven-jar-plugin>3.0.2</version.maven-jar-plugin>
+        <version.jjwt>0.7.0</version.jjwt>
     </properties>
 
     <dependencyManagement>
@@ -79,6 +80,11 @@
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${versions.jackson-databind}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${version.jjwt}</version>
             </dependency>
             <dependency>
                 <groupId>de.tse.example</groupId>

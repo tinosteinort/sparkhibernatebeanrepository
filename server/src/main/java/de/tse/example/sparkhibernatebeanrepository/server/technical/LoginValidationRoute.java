@@ -2,6 +2,8 @@ package de.tse.example.sparkhibernatebeanrepository.server.technical;
 
 import com.github.tinosteinort.beanrepository.BeanAccessor;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.LoginRoute;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -18,11 +20,23 @@ public class LoginValidationRoute implements Route {
 
     @Override public Object handle(final Request request, final Response response) throws Exception {
 
-        final String userId = request.cookie(LoginRoute.USER_ID);
-        if (userId == null) {
+        final String token = request.cookie(LoginRoute.USER_ID);
+        if (token == null) {
             throw new RuntimeException("Not authenticated");
         }
 
-        return contextExecutor.execute(userId, () -> route.handle(request, response));
+        final String username = getUserFromToken(token);
+
+        return contextExecutor.execute(username, () -> route.handle(request, response));
+    }
+
+    private String getUserFromToken(final String token) {
+
+        final Claims claims = Jwts.parser()
+                .setSigningKey("MyKey".getBytes())
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
     }
 }
