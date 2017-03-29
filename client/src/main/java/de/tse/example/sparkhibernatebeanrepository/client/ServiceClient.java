@@ -2,6 +2,7 @@ package de.tse.example.sparkhibernatebeanrepository.client;
 
 import com.github.tinosteinort.beanrepository.BeanAccessor;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
+import de.tse.example.sparkhibernatebeanrepository.api.to.FilterTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoListTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoTO;
 import de.tse.example.sparkhibernatebeanrepository.client.base.HttpService;
@@ -28,9 +29,9 @@ public class ServiceClient {
         }
     }
 
-    public InputInfoListTO findInputInfos(final String searchValue) {
+    public InputInfoListTO findByFilter(final FilterTO filter) {
         try {
-            return httpService.get(urlProvider.provide(searchValue), InputInfoListTO.class);
+            return httpService.post(urlProvider.provide("filter"), filter, InputInfoListTO.class);
         }
         catch (IOException ex) {
             throw new RuntimeException(ex);

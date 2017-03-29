@@ -3,14 +3,13 @@ package client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tinosteinort.beanrepository.BeanRepository;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
+import de.tse.example.sparkhibernatebeanrepository.api.to.FilterTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoListTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoTO;
 import de.tse.example.sparkhibernatebeanrepository.client.LoginService;
 import de.tse.example.sparkhibernatebeanrepository.client.base.*;
 import de.tse.example.sparkhibernatebeanrepository.client.ServiceClient;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,7 +87,9 @@ public class TestClient {
         final InputInfoTO item11 = service.create(new CreateInputTO("item11"));
         final InputInfoTO item2 = service.create(new CreateInputTO("Item2"));
 
-        final InputInfoListTO searchResult = service.findInputInfos("Item1");
+        final FilterTO filter = new FilterTO();
+        filter.setSearchValue("Item1");
+        final InputInfoListTO searchResult = service.findByFilter(filter);
         Assert.assertEquals(2, searchResult.getInputInfos().size());
         Assert.assertEquals("item11", searchResult.getInputInfos().get(0).getData());
         Assert.assertEquals("Item1", searchResult.getInputInfos().get(1).getData());

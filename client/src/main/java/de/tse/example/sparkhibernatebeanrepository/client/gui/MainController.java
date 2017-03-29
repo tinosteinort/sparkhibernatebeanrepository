@@ -1,6 +1,7 @@
 package de.tse.example.sparkhibernatebeanrepository.client.gui;
 
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
+import de.tse.example.sparkhibernatebeanrepository.api.to.FilterTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoListTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoTO;
 import de.tse.example.sparkhibernatebeanrepository.client.ServiceClient;
@@ -88,13 +89,11 @@ public class MainController extends FxmlController implements Initializable {
     @FXML public void searchData() {
         final String searchText = searchValue.get();
 
+        final FilterTO filter = new FilterTO();
+        filter.setSearchValue(searchText);
+
         guiExecutor.execute(
-                () -> {
-                    if ("".equals(searchText) || searchText == null) {
-                        return serviceClient.getInputInfos();
-                    }
-                    return serviceClient.findInputInfos(searchText);
-                },
+                () -> serviceClient.findByFilter(filter),
                 (InputInfoListTO searchResult) -> {
                     infos.clear();
                     infos.addAll(searchResult.getInputInfos());

@@ -1,26 +1,23 @@
 package de.tse.example.sparkhibernatebeanrepository.server.functional;
 
 import com.github.tinosteinort.beanrepository.BeanAccessor;
+import de.tse.example.sparkhibernatebeanrepository.api.to.FilterTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoListTO;
-import spark.Request;
-import spark.Response;
-import spark.Route;
+import de.tse.example.sparkhibernatebeanrepository.server.technical.AbstractMarshallingRoute;
 
-public class SearchDataRoute implements Route {
-
-    public static final String SEARCH_VALUE = ":searchvalue";
+public class SearchDataRoute extends AbstractMarshallingRoute<FilterTO, InputInfoListTO> {
 
     private final InputInfoQueryService inputInfoQueryService;
 
     public SearchDataRoute(final BeanAccessor beans) {
+        super(FilterTO.class, beans);
         this.inputInfoQueryService = beans.getBean(InputInfoQueryService.class);
     }
 
-    @Override public InputInfoListTO handle(final Request request, final Response response) throws Exception {
-        final String searchValue = request.params(SEARCH_VALUE);
-        if ("".equals(searchValue) || searchValue == null) {
-            throw new IllegalArgumentException("Parameter for search required");
+    @Override protected InputInfoListTO handleRequest(final FilterTO filter) {
+        if (filter.getSearchValue() == null || "".equals(filter.getSearchValue())) {
+            return inputInfoQueryService.listAll();
         }
-        return inputInfoQueryService.findAllContaining(searchValue);
+        return inputInfoQueryService.findAllContaining(filter.getSearchValue());
     }
 }
