@@ -8,6 +8,7 @@ import de.tse.example.sparkhibernatebeanrepository.server.functional.GetDataRout
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputInfoQueryService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.LoginRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.functional.PasswordService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.SearchDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.UserService;
 import org.hibernate.SessionFactory;
@@ -19,7 +20,7 @@ public class BeanRepositoryBootstrap {
     private void registerBeans() {
         builder.singleton(DbService.class, DbService::new, SessionFactory.class)
                 .singleton(InputService.class, InputService::new, DbService.class)
-                .singleton(LoginRoute.class, LoginRoute::new, UserService.class, RequestUnmarshaller.class)
+                .singleton(LoginRoute.class, LoginRoute::new, UserService.class, RequestUnmarshaller.class, JwtHandler.class, PasswordService.class)
                 .singleton(CreateDataRoute.class, CreateDataRoute::new)
                 .singleton(GetDataRoute.class, GetDataRoute::new)
                 .singleton(SearchDataRoute.class, SearchDataRoute::new)
@@ -36,7 +37,9 @@ public class BeanRepositoryBootstrap {
                 .singleton(JsonResponseTransformer.class, JsonResponseTransformer::new)
                 .singleton(JsonContentTypeFilter.class, JsonContentTypeFilter::new)
                 .singleton(RequestLogger.class, RequestLogger::new)
-                .singleton(ResponseLogger.class, ResponseLogger::new);
+                .singleton(ResponseLogger.class, ResponseLogger::new)
+                .singleton(JwtHandler.class, JwtHandler::new)
+                .singleton(PasswordService.class, PasswordService::new, DbService.class);
     }
 
     public BeanRepository bootstrap() {

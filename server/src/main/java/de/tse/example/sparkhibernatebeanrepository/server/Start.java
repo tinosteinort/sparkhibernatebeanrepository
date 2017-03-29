@@ -7,6 +7,7 @@ import de.tse.example.sparkhibernatebeanrepository.server.functional.DeleteDataR
 import de.tse.example.sparkhibernatebeanrepository.server.functional.GetDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.LoginRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.functional.PasswordService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.SearchDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.UserService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.UserBO;
@@ -73,13 +74,16 @@ public class Start {
         transactionExecutor.executeWithinTransaction(() -> contextExecutor.execute(() -> {
 
             final UserService userService = repo.getBean(UserService.class);
+            final PasswordService passwordService = repo.getBean(PasswordService.class);
             final UserBO tino = new UserBO();
             tino.setName("tino");
             userService.save(tino);
+            passwordService.createPassword(tino, "tinopw");
 
             final UserBO donnie = new UserBO();
             donnie.setName("donnie");
             userService.save(donnie);
+            passwordService.createPassword(donnie, "donniepw");
 
 
             final InputService inputService = repo.getBean(InputService.class);

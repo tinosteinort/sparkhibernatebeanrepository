@@ -1,6 +1,7 @@
 package de.tse.example.sparkhibernatebeanrepository.server.technical;
 
 import com.github.tinosteinort.beanrepository.Factory;
+import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.PasswordBO;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.SavedInputBO;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.UserBO;
 import org.hibernate.SessionFactory;
@@ -30,6 +31,7 @@ public class SessionFactoryFactory implements Factory<SessionFactory> {
         final MetadataSources sources = new MetadataSources(standardRegistry);
         sources.addAnnotatedClass(SavedInputBO.class);
         sources.addAnnotatedClass(UserBO.class);
+        sources.addAnnotatedClass(PasswordBO.class);
 
         final Metadata metadata = sources.buildMetadata();
 

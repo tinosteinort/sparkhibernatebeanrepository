@@ -2,8 +2,6 @@ package de.tse.example.sparkhibernatebeanrepository.server.technical;
 
 import com.github.tinosteinort.beanrepository.BeanAccessor;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.LoginRoute;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -11,10 +9,12 @@ import spark.Route;
 public class LoginValidationRoute implements Route {
 
     private final ContextExecutor contextExecutor;
+    private final JwtHandler jwtHandler;
     private final Route route;
 
     public LoginValidationRoute(final BeanAccessor beans, final Route route) {
         this.contextExecutor = beans.getBean(ContextExecutor.class);
+        this.jwtHandler = beans.getBean(JwtHandler.class);
         this.route = route;
     }
 
@@ -25,18 +25,8 @@ public class LoginValidationRoute implements Route {
             throw new RuntimeException("Not authenticated");
         }
 
-        final String username = getUserFromToken(token);
+        final String username = jwtHandler.determineUserFromToken(token);
 
         return contextExecutor.execute(username, () -> route.handle(request, response));
-    }
-
-    private String getUserFromToken(final String token) {
-
-        final Claims claims = Jwts.parser()
-                .setSigningKey("MyKey".getBytes())
-                .parseClaimsJws(token)
-                .getBody();
-
-        return claims.getSubject();
     }
 }
