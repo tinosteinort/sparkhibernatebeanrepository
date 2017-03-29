@@ -5,6 +5,8 @@ import com.github.tinosteinort.beanrepository.BeanRepository;
 import de.tse.example.sparkhibernatebeanrepository.client.base.*;
 import de.tse.example.sparkhibernatebeanrepository.client.gui.LoginController;
 import de.tse.example.sparkhibernatebeanrepository.client.gui.MainController;
+import de.tse.example.sparkhibernatebeanrepository.client.services.CommandService;
+import de.tse.example.sparkhibernatebeanrepository.client.services.LoginService;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;

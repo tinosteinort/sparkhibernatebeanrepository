@@ -2,7 +2,7 @@ package de.tse.example.sparkhibernatebeanrepository.client.gui;
 
 import com.github.tinosteinort.beanrepository.BeanAccessor;
 import de.tse.example.sparkhibernatebeanrepository.api.base.AuthenticationStatus;
-import de.tse.example.sparkhibernatebeanrepository.client.LoginService;
+import de.tse.example.sparkhibernatebeanrepository.client.services.LoginService;
 import de.tse.example.sparkhibernatebeanrepository.client.base.FxmlController;
 import de.tse.example.sparkhibernatebeanrepository.client.base.GuiExecutor;
 import javafx.beans.property.SimpleStringProperty;

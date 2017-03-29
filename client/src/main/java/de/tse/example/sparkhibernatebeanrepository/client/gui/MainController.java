@@ -7,7 +7,7 @@ import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.FilterTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoListTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoTO;
-import de.tse.example.sparkhibernatebeanrepository.client.CommandService;
+import de.tse.example.sparkhibernatebeanrepository.client.services.CommandService;
 import de.tse.example.sparkhibernatebeanrepository.client.base.FxmlController;
 import de.tse.example.sparkhibernatebeanrepository.client.base.GuiExecutor;
 import javafx.beans.property.SimpleStringProperty;
