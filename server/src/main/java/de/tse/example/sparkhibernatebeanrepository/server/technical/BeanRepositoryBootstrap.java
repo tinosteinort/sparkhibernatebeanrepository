@@ -19,30 +19,48 @@ public class BeanRepositoryBootstrap {
     private final BeanRepository.BeanRepositoryBuilder builder = new BeanRepository.BeanRepositoryBuilder();
 
     private void registerBeans() {
-        builder.singleton(DbService.class, DbService::new, SessionFactory.class)
-                .singleton(InputService.class, InputService::new, DbService.class)
-                .singleton(LoginRoute.class, LoginRoute::new, RequestUnmarshaller.class, JwtHandler.class, PasswordService.class)
-                .singleton(GetDataCommandExecutor.class, GetDataCommandExecutor::new, InputInfoQueryService.class)
-                .singleton(CreateDataCommandExecutor.class, CreateDataCommandExecutor::new, InputService.class, InputInfoQueryService.class)
-                .singleton(DeleteDataCommandExecutor.class, DeleteDataCommandExecutor::new, InputService.class)
-                .singleton(CommandExecutorRoute.class, CommandExecutorRoute::new, CommandExecutorPool.class)
-                .singleton(CommandExecutorPool.class, CommandExecutorPool::new, RequestUnmarshaller.class)
-                .singletonFactory(SessionFactory.class, SessionFactoryFactory::new)
-                .singleton(TransactionExecutor.class, TransactionExecutor::new)
-                .singleton(ContextExecutor.class, ContextExecutor::new)
-                .singleton(UserFilterExecutor.class, UserFilterExecutor::new)
-                .singleton(UserService.class, UserService::new, DbService.class)
-                .singleton(InputInfoQueryService.class, InputInfoQueryService::new)
-                .singleton(MyExceptionHandler.class, MyExceptionHandler::new)
-                .singletonFactory(ObjectMapper.class, ObjectMapperFactory::new)
-                .singleton(RequestUnmarshaller.class, RequestUnmarshaller::new, ObjectMapper.class)
-                .singleton(JsonResponseTransformer.class, JsonResponseTransformer::new)
-                .singleton(JsonContentTypeFilter.class, JsonContentTypeFilter::new)
-                .singleton(RequestLogger.class, RequestLogger::new)
-                .singleton(ResponseLogger.class, ResponseLogger::new)
-                .singleton(JwtHandler.class, JwtHandler::new)
-                .singleton(PasswordService.class, PasswordService::new, DbService.class, PasswordHashService.class)
-                .singleton(PasswordHashService.class, PasswordHashService::new);
+
+        registerTechnicalBeans();
+        registerServices();
+        registerRoutes();
+        registerCommands();
+    }
+
+    private void registerTechnicalBeans() {
+        builder.singleton(CommandExecutorPool.class, CommandExecutorPool::new, RequestUnmarshaller.class);
+        builder.singletonFactory(SessionFactory.class, SessionFactoryFactory::new);
+        builder.singleton(TransactionExecutor.class, TransactionExecutor::new);
+        builder.singleton(ContextExecutor.class, ContextExecutor::new);
+        builder.singleton(UserFilterExecutor.class, UserFilterExecutor::new);
+        builder.singleton(MyExceptionHandler.class, MyExceptionHandler::new);
+        builder.singletonFactory(ObjectMapper.class, ObjectMapperFactory::new);
+        builder.singleton(RequestUnmarshaller.class, RequestUnmarshaller::new, ObjectMapper.class);
+        builder.singleton(JsonResponseTransformer.class, JsonResponseTransformer::new);
+        builder.singleton(JsonContentTypeFilter.class, JsonContentTypeFilter::new);
+        builder.singleton(RequestLogger.class, RequestLogger::new);
+        builder.singleton(ResponseLogger.class, ResponseLogger::new);
+        builder.singleton(JwtHandler.class, JwtHandler::new);
+    }
+
+    private void registerServices() {
+        builder.singleton(DbService.class, DbService::new, SessionFactory.class);
+        builder.singleton(InputService.class, InputService::new, DbService.class);
+        builder.singleton(UserService.class, UserService::new, DbService.class);
+        builder.singleton(InputInfoQueryService.class, InputInfoQueryService::new);
+        builder.singleton(PasswordService.class, PasswordService::new, DbService.class, PasswordHashService.class);
+        builder.singleton(PasswordHashService.class, PasswordHashService::new);
+    }
+
+    private void registerRoutes() {
+        builder.singleton(LoginRoute.class, LoginRoute::new, RequestUnmarshaller.class, JwtHandler.class, PasswordService.class);
+        builder.singleton(CommandExecutorRoute.class, CommandExecutorRoute::new, CommandExecutorPool.class);
+    }
+
+    private void registerCommands() {
+        builder.singleton(GetDataCommandExecutor.class, GetDataCommandExecutor::new, InputInfoQueryService.class);
+        builder.singleton(CreateDataCommandExecutor.class, CreateDataCommandExecutor::new, InputService.class, InputInfoQueryService.class);
+        builder.singleton(DeleteDataCommandExecutor.class, DeleteDataCommandExecutor::new, InputService.class);
+
     }
 
     public BeanRepository bootstrap() {
