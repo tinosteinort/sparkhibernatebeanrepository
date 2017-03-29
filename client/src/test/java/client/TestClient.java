@@ -39,7 +39,7 @@ public class TestClient {
                 .singleton(HttpService.class, HttpService::new, CloseableHttpClient.class, ObjectMapper.class)
                 .build();
 
-        repo.getBean(LoginService.class).login("tino");
+        repo.getBean(LoginService.class).login("tino", "tinopw");
     }
 
     @Test public void testGet() throws IOException {

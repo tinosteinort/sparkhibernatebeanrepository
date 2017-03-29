@@ -13,18 +13,18 @@ public class PasswordService {
         this.dbService = dbService;
     }
 
-    public void validateCredentials(final String user, final String password) {
-        validatePassword(loadPassword(user), password);
+    public boolean credentialsAreValid(final String user, final String password) {
+        return passwordIsValid(loadPassword(user), password);
     }
 
-    private void validatePassword(final PasswordBO expected, final String password) {
+    private boolean passwordIsValid(final PasswordBO expected, final String password) {
         if (expected == null) {
-            throw new IllegalArgumentException("Password Validation failed");
+            return false;
         }
-
         if (!expected.getPassword().equals(calculatePassword(password))) {
-            throw new IllegalArgumentException("Password Validation failed");
+            return false;
         }
+        return true;
     }
 
     private PasswordBO loadPassword(final String user) {

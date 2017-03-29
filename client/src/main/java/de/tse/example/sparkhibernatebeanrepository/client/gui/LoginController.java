@@ -12,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -27,7 +28,9 @@ public class LoginController extends FxmlController implements Initializable {
     private final LoginService loginService;
 
     @FXML private TextField nameField;
+    @FXML private PasswordField passwordField;
     private final StringProperty name = new SimpleStringProperty();
+    private final StringProperty password = new SimpleStringProperty();
 
     public LoginController(final BeanAccessor beans) {
         this.beans = beans;
@@ -38,12 +41,13 @@ public class LoginController extends FxmlController implements Initializable {
 
     @Override public void initialize(final URL location, final ResourceBundle resources) {
         nameField.textProperty().bindBidirectional(name);
+        passwordField.textProperty().bindBidirectional(password);
     }
 
     @FXML public void doLogin() {
-        if (nameField != null && !"".equals(name.get())) {
+        if (credentialsComplete()) {
 
-            login(name.get(), (AuthenticationStatus status) -> {
+            login(name.get(), password.get(), (AuthenticationStatus status) -> {
                         switch (status) {
                             case AUTHENTICATED:
                                 openMainController();
@@ -57,9 +61,14 @@ public class LoginController extends FxmlController implements Initializable {
         }
     }
 
-    private void login(final String name, final Consumer<AuthenticationStatus> consumer) {
+    private boolean credentialsComplete() {
+        return name.get() != null && !"".equals(name.get())
+                && password.get() != null && !"".equals(password.get());
+    }
+
+    private void login(final String name, final String password, final Consumer<AuthenticationStatus> consumer) {
         guiExecutor.execute(
-                () -> loginService.login(name),
+                () -> loginService.login(name, password),
                 consumer
         );
     }

@@ -9,11 +9,17 @@
 <BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <center>
         <VBox alignment="CENTER">
-            <Label text="Anmeldename eingeben:" />
-            <FlowPane alignment="CENTER">
-                <TextField fx:id="nameField" onAction="#doLogin" />
-                <Button text="Login" onAction="#doLogin" />
-            </FlowPane>
+            <Label text="Anmeldung" />
+            <VBox alignment="CENTER" spacing="10">
+                <VBox>
+                    <TextField fx:id="nameField" promptText="Name" />
+                    <PasswordField fx:id="passwordField" promptText="Passwort" onAction="#doLogin" />
+                </VBox>
+                <HBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button text="Login" onAction="#doLogin" />
+                </HBox>
+            </VBox>
         </VBox>
     </center>
 </BorderPane>

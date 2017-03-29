@@ -40,7 +40,7 @@ public class ClientApplication extends Application {
         final LoginController controller = repo.getBean(LoginController.class);
 
         final Parent root = (Parent) controller.getView();
-        final Scene scene = new Scene(root, 300, 100);
+        final Scene scene = new Scene(root, 250, 120);
 
         primaryStage.setTitle("Client Application Login");
         primaryStage.setScene(scene);

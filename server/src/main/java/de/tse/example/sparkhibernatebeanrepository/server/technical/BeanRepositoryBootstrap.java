@@ -20,7 +20,7 @@ public class BeanRepositoryBootstrap {
     private void registerBeans() {
         builder.singleton(DbService.class, DbService::new, SessionFactory.class)
                 .singleton(InputService.class, InputService::new, DbService.class)
-                .singleton(LoginRoute.class, LoginRoute::new, UserService.class, RequestUnmarshaller.class, JwtHandler.class, PasswordService.class)
+                .singleton(LoginRoute.class, LoginRoute::new, RequestUnmarshaller.class, JwtHandler.class, PasswordService.class)
                 .singleton(CreateDataRoute.class, CreateDataRoute::new)
                 .singleton(GetDataRoute.class, GetDataRoute::new)
                 .singleton(SearchDataRoute.class, SearchDataRoute::new)

@@ -16,31 +16,33 @@ public class LoginRoute implements Route {
 
     public static final String USER_ID = "USERID";
 
-    private final UserService userService;
     private final RequestUnmarshaller requestUnmarshaller;
     private final JwtHandler jwtHandler;
     private final PasswordService passwordService;
 
-    public LoginRoute(final UserService userService, final RequestUnmarshaller requestUnmarshaller,
+    public LoginRoute(final RequestUnmarshaller requestUnmarshaller,
             final JwtHandler jwtHandler, final PasswordService passwordService) {
-        this.userService = userService;
         this.requestUnmarshaller = requestUnmarshaller;
         this.jwtHandler = jwtHandler;
         this.passwordService = passwordService;
     }
 
     @Override public AuthenticationStatus handle(final Request request, final Response response) throws Exception {
-        final String name = requestUnmarshaller.unmarshall(request, String.class);
-        final UserBO user = userService.loadByName(name);
+        final String namePasswordCombination = requestUnmarshaller.unmarshall(request, String.class);
+        final String[] credentials = credentials(namePasswordCombination);
 
-        if (user == null) {
-            return AuthenticationStatus.NOT_AUTHENTICATED;
+        final String name = credentials[0];
+        final String password = credentials[1];
+
+        if (passwordService.credentialsAreValid(name, password)) {
+            LOG.debug("User %s logged id", name);
+            response.cookie(USER_ID, jwtHandler.generateToken(name));
+            return AuthenticationStatus.AUTHENTICATED;
         }
+        return AuthenticationStatus.NOT_AUTHENTICATED;
+    }
 
-        passwordService.validateCredentials(user.getName(), "tinopw");
-
-        LOG.debug("User %s logged id", user.getName());
-        response.cookie(USER_ID, jwtHandler.generateToken(user.getName()));
-        return AuthenticationStatus.AUTHENTICATED;
+    private String[] credentials(final String namePasswordCombination) {
+        return namePasswordCombination.split("\\:");
     }
 }

@@ -17,12 +17,17 @@ public class LoginService {
         this.urlProvider = beans.getPrototypeBean(ServiceUrlProvider::new, "login");
     }
 
-    public AuthenticationStatus login(final String name) {
+    public AuthenticationStatus login(final String name, final String password) {
         try {
-            return httpService.post(urlProvider.provide(), name, AuthenticationStatus.class);
+            return httpService.post(urlProvider.provide(), namePasswordCombination(name, password), AuthenticationStatus.class);
         }
         catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private String namePasswordCombination(final String name, final String password) {
+        // TODO transfer infos in other format. FormSubmit? Base64 encoded?
+        return name + ":" + password;
     }
 }
