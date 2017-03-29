@@ -11,7 +11,12 @@ public class RequestLogger implements Filter {
     private static final Logger LOG = LoggerFactory.getLogger(RequestLogger.class);
 
     @Override public void handle(final Request request, final Response response) throws Exception {
-        final String body = request.body() == null || "".equals(request.body()) ? "" : request.body();
-        LOG.info(">> Requested URL: " + request.url() + System.lineSeparator() + body);
+        if (request.url().endsWith("login")) {
+            LOG.info(">> Requested URL: " + request.url());
+        }
+        else {
+            final String body = request.body() == null || "".equals(request.body()) ? "" : request.body();
+            LOG.info(">> Requested URL: " + request.url() + System.lineSeparator() + body);
+        }
     }
 }

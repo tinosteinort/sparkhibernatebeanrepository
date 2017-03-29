@@ -8,6 +8,7 @@ import de.tse.example.sparkhibernatebeanrepository.server.functional.GetDataRout
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputInfoQueryService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.LoginRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.functional.PasswordHashService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.PasswordService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.SearchDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.UserService;
@@ -39,7 +40,8 @@ public class BeanRepositoryBootstrap {
                 .singleton(RequestLogger.class, RequestLogger::new)
                 .singleton(ResponseLogger.class, ResponseLogger::new)
                 .singleton(JwtHandler.class, JwtHandler::new)
-                .singleton(PasswordService.class, PasswordService::new, DbService.class);
+                .singleton(PasswordService.class, PasswordService::new, DbService.class, PasswordHashService.class)
+                .singleton(PasswordHashService.class, PasswordHashService::new);
     }
 
     public BeanRepository bootstrap() {

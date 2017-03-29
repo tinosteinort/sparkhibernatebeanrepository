@@ -8,9 +8,11 @@ import org.hibernate.query.Query;
 public class PasswordService {
 
     private final DbService dbService;
+    private final PasswordHashService passwordHashService;
 
-    public PasswordService(final DbService dbService) {
+    public PasswordService(final DbService dbService, final PasswordHashService passwordHashService) {
         this.dbService = dbService;
+        this.passwordHashService = passwordHashService;
     }
 
     public boolean credentialsAreValid(final String user, final String password) {
@@ -18,13 +20,8 @@ public class PasswordService {
     }
 
     private boolean passwordIsValid(final PasswordBO expected, final String password) {
-        if (expected == null) {
-            return false;
-        }
-        if (!expected.getPassword().equals(calculatePassword(password))) {
-            return false;
-        }
-        return true;
+        return expected != null &&
+                expected.getPassword().equals(passwordHashService.calculateHash(expected.getUser(), password));
     }
 
     private PasswordBO loadPassword(final String user) {
@@ -43,12 +40,8 @@ public class PasswordService {
 
         final PasswordBO pw = new PasswordBO();
         pw.setUser(user);
-        pw.setPassword(calculatePassword(password));
+        pw.setPassword(passwordHashService.calculateHash(user, password));
 
         dbService.save(pw);
-    }
-
-    private String calculatePassword(final String pw) {
-        return "##PW_" + pw + "_WP##";
     }
 }
