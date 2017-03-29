@@ -1,10 +1,13 @@
 package de.tse.example.sparkhibernatebeanrepository.client.gui;
 
+import de.tse.example.sparkhibernatebeanrepository.api.command.CreateDataCommand;
+import de.tse.example.sparkhibernatebeanrepository.api.command.DeleteDataCommand;
+import de.tse.example.sparkhibernatebeanrepository.api.command.GetDataCommand;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.FilterTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoListTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoTO;
-import de.tse.example.sparkhibernatebeanrepository.client.ServiceClient;
+import de.tse.example.sparkhibernatebeanrepository.client.CommandService;
 import de.tse.example.sparkhibernatebeanrepository.client.base.FxmlController;
 import de.tse.example.sparkhibernatebeanrepository.client.base.GuiExecutor;
 import javafx.beans.property.SimpleStringProperty;
@@ -24,7 +27,7 @@ import java.util.ResourceBundle;
 public class MainController extends FxmlController implements Initializable {
 
     private final GuiExecutor guiExecutor;
-    private final ServiceClient serviceClient;
+    private final CommandService commandService;
 
     @FXML private TextField inputField;
     @FXML private TextField searchField;
@@ -36,9 +39,9 @@ public class MainController extends FxmlController implements Initializable {
     private final StringProperty searchValue = new SimpleStringProperty();
     private final ObservableList<InputInfoTO> infos = FXCollections.observableArrayList();
 
-    public MainController(final GuiExecutor guiExecutor, final ServiceClient serviceClient) {
+    public MainController(final GuiExecutor guiExecutor, final CommandService commandService) {
         this.guiExecutor = guiExecutor;
-        this.serviceClient = serviceClient;
+        this.commandService = commandService;
     }
 
     @Override protected String getFxml() {
@@ -68,7 +71,7 @@ public class MainController extends FxmlController implements Initializable {
         input.setInput(text);
 
         guiExecutor.execute(
-                () -> serviceClient.create(input),
+                () -> commandService.execute(new CreateDataCommand(input)),
                 (InputInfoTO createdInput) -> {
                     infos.add(0, createdInput);
                     inputData.set(null);
@@ -81,7 +84,7 @@ public class MainController extends FxmlController implements Initializable {
         if (itemToDelete != null) {
 
             guiExecutor.execute(
-                    () -> serviceClient.delete(itemToDelete),
+                    () -> commandService.execute(new DeleteDataCommand(itemToDelete.getId())),
                     () -> infos.remove(itemToDelete));
         }
     }
@@ -93,7 +96,7 @@ public class MainController extends FxmlController implements Initializable {
         filter.setSearchValue(searchText);
 
         guiExecutor.execute(
-                () -> serviceClient.findByFilter(filter),
+                () -> commandService.execute(new GetDataCommand(filter)),
                 (InputInfoListTO searchResult) -> {
                     infos.clear();
                     infos.addAll(searchResult.getInputInfos());
@@ -111,8 +114,10 @@ public class MainController extends FxmlController implements Initializable {
     }
 
     private void loadAllData() {
+        final FilterTO filter = new FilterTO();
+
         guiExecutor.execute(
-                serviceClient::getInputInfos,
+                () -> commandService.execute(new GetDataCommand(filter)),
                 (InputInfoListTO inputInfos) -> {
                     infos.clear();
                     infos.addAll(inputInfos.getInputInfos());

@@ -1,7 +1,7 @@
 package de.tse.example.sparkhibernatebeanrepository.client;
 
 import com.github.tinosteinort.beanrepository.BeanAccessor;
-import de.tse.example.sparkhibernatebeanrepository.api.to.AuthenticationStatus;
+import de.tse.example.sparkhibernatebeanrepository.api.base.AuthenticationStatus;
 import de.tse.example.sparkhibernatebeanrepository.client.base.HttpService;
 import de.tse.example.sparkhibernatebeanrepository.client.base.ServiceUrlProvider;
 

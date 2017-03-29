@@ -28,12 +28,12 @@ public class ClientApplication extends Application {
                 .instance(primaryStage)
                 .instance(config)
                 .singleton(LoginController.class, LoginController::new)
-                .singleton(MainController.class, MainController::new, GuiExecutor.class, ServiceClient.class)
+                .singleton(MainController.class, MainController::new, GuiExecutor.class, CommandService.class)
                 .singletonFactory(ObjectMapper.class, ObjectMapperFactory::new)
                 .singletonFactory(CloseableHttpClient.class, HttpClientFactory::new, Configuration.class)
                 .singleton(HttpService.class, HttpService::new, CloseableHttpClient.class, ObjectMapper.class)
                 .singleton(LoginService.class, LoginService::new)
-                .singleton(ServiceClient.class, ServiceClient::new)
+                .singleton(CommandService.class, CommandService::new)
                 .singleton(GuiExecutor.class, GuiExecutor::new)
                 .build();
 

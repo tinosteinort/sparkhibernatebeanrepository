@@ -2,13 +2,19 @@ package client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tinosteinort.beanrepository.BeanRepository;
+import de.tse.example.sparkhibernatebeanrepository.api.command.CreateDataCommand;
+import de.tse.example.sparkhibernatebeanrepository.api.command.DeleteDataCommand;
+import de.tse.example.sparkhibernatebeanrepository.api.command.GetDataCommand;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.FilterTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoListTO;
 import de.tse.example.sparkhibernatebeanrepository.api.to.InputInfoTO;
+import de.tse.example.sparkhibernatebeanrepository.client.CommandService;
 import de.tse.example.sparkhibernatebeanrepository.client.LoginService;
-import de.tse.example.sparkhibernatebeanrepository.client.base.*;
-import de.tse.example.sparkhibernatebeanrepository.client.ServiceClient;
+import de.tse.example.sparkhibernatebeanrepository.client.base.Configuration;
+import de.tse.example.sparkhibernatebeanrepository.client.base.HttpClientFactory;
+import de.tse.example.sparkhibernatebeanrepository.client.base.HttpService;
+import de.tse.example.sparkhibernatebeanrepository.client.base.ObjectMapperFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,7 +40,7 @@ public class TestClient {
                 .singletonFactory(ObjectMapper.class, ObjectMapperFactory::new)
                 .singletonFactory(CloseableHttpClient.class, HttpClientFactory::new, Configuration.class)
                 .singleton(LoginService.class, LoginService::new)
-                .singleton(ServiceClient.class, ServiceClient::new)
+                .singleton(CommandService.class, CommandService::new)
                 .singleton(HttpService.class, HttpService::new, CloseableHttpClient.class, ObjectMapper.class)
                 .build();
 
@@ -43,9 +49,9 @@ public class TestClient {
 
     @Test public void testGet() throws IOException {
 
-        final ServiceClient service = repo.getBean(ServiceClient.class);
+        final CommandService service = repo.getBean(CommandService.class);
 
-        final InputInfoListTO result = service.getInputInfos();
+        final InputInfoListTO result = service.execute(new GetDataCommand(new FilterTO()));
         System.out.println("InfoCount: " + result.getInputInfos().size());
         for (InputInfoTO info : result.getInputInfos()) {
             System.out.println("  " + info);
@@ -54,48 +60,48 @@ public class TestClient {
 
     @Test public void testCreate() throws IOException {
 
-        final ServiceClient service = repo.getBean(ServiceClient.class);
+        final CommandService service = repo.getBean(CommandService.class);
 
         final CreateInputTO newInput = new CreateInputTO("TiTaTest");
-        final InputInfoTO createdInput = service.create(newInput);
+        final InputInfoTO createdInput = service.execute(new CreateDataCommand(newInput));
         System.out.println(createdInput);
     }
 
     @Test public void testDelete() throws Exception {
 
-        final ServiceClient service = repo.getBean(ServiceClient.class);
+        final CommandService service = repo.getBean(CommandService.class);
 
-        final int initialDataCount = service.getInputInfos().getInputInfos().size();
+        final int initialDataCount = service.execute(new GetDataCommand(new FilterTO())).getInputInfos().size();
 
         final CreateInputTO newData = new CreateInputTO("DeletionTest");
-        final InputInfoTO createdData = service.create(newData);
+        final InputInfoTO createdData = service.execute(new CreateDataCommand(newData));
 
-        final int dataCountAfterCreate = service.getInputInfos().getInputInfos().size();
+        final int dataCountAfterCreate = service.execute(new GetDataCommand(new FilterTO())).getInputInfos().size();
         Assert.assertEquals(initialDataCount + 1, dataCountAfterCreate);
 
-        service.delete(createdData);
+        service.execute(new DeleteDataCommand(createdData.getId()));
 
-        final int dataCountAfterDelete = service.getInputInfos().getInputInfos().size();
+        final int dataCountAfterDelete = service.execute(new GetDataCommand(new FilterTO())).getInputInfos().size();
         Assert.assertEquals(initialDataCount, dataCountAfterDelete);
     }
 
     @Test public void testFind() throws Exception {
 
-        final ServiceClient service = repo.getBean(ServiceClient.class);
+        final CommandService service = repo.getBean(CommandService.class);
 
-        final InputInfoTO item1 = service.create(new CreateInputTO("Item1"));
-        final InputInfoTO item11 = service.create(new CreateInputTO("item11"));
-        final InputInfoTO item2 = service.create(new CreateInputTO("Item2"));
+        final InputInfoTO item1 = service.execute(new CreateDataCommand(new CreateInputTO("Item1")));
+        final InputInfoTO item11 = service.execute(new CreateDataCommand(new CreateInputTO("item11")));
+        final InputInfoTO item2 = service.execute(new CreateDataCommand(new CreateInputTO("Item2")));
 
         final FilterTO filter = new FilterTO();
         filter.setSearchValue("Item1");
-        final InputInfoListTO searchResult = service.findByFilter(filter);
+        final InputInfoListTO searchResult = service.execute(new GetDataCommand(filter));
         Assert.assertEquals(2, searchResult.getInputInfos().size());
         Assert.assertEquals("item11", searchResult.getInputInfos().get(0).getData());
         Assert.assertEquals("Item1", searchResult.getInputInfos().get(1).getData());
 
-        service.delete(item1);
-        service.delete(item11);
-        service.delete(item2);
+        service.execute(new DeleteDataCommand(item1.getId()));
+        service.execute(new DeleteDataCommand(item11.getId()));
+        service.execute(new DeleteDataCommand(item2.getId()));
     }
 }

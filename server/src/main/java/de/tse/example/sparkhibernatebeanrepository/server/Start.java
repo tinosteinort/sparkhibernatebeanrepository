@@ -2,16 +2,13 @@ package de.tse.example.sparkhibernatebeanrepository.server;
 
 import com.github.tinosteinort.beanrepository.BeanRepository;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
-import de.tse.example.sparkhibernatebeanrepository.server.functional.CreateDataRoute;
-import de.tse.example.sparkhibernatebeanrepository.server.functional.DeleteDataRoute;
-import de.tse.example.sparkhibernatebeanrepository.server.functional.GetDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.LoginRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.PasswordService;
-import de.tse.example.sparkhibernatebeanrepository.server.functional.SearchDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.UserService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.UserBO;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.BeanRepositoryBootstrap;
+import de.tse.example.sparkhibernatebeanrepository.server.technical.CommandExecutorRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.ContextExecutor;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.JsonContentTypeFilter;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.JsonResponseTransformer;
@@ -24,7 +21,7 @@ import de.tse.example.sparkhibernatebeanrepository.server.technical.TransactionE
 import spark.Route;
 import spark.Spark;
 
-import static de.tse.example.sparkhibernatebeanrepository.server.functional.DeleteDataRoute.DELETE_ID;
+import static de.tse.example.sparkhibernatebeanrepository.server.technical.CommandExecutorRoute.COMMAND_PARAM;
 
 public class Start {
 
@@ -55,10 +52,8 @@ public class Start {
         Spark.after(repo.getBean(ResponseLogger.class));
 
         Spark.post("/login", withTransaction(LoginRoute.class), responseTransformer);
-        Spark.get("/data", withTransactionAndUser(GetDataRoute.class), responseTransformer);
-        Spark.post("/data/filter", withTransactionAndUser(SearchDataRoute.class), responseTransformer);
-        Spark.post("/data", withTransactionAndUser(CreateDataRoute.class), responseTransformer);
-        Spark.delete("/data/" + DELETE_ID, withTransactionAndUser(DeleteDataRoute.class), responseTransformer);
+
+        Spark.post("/command/" + COMMAND_PARAM, withTransactionAndUser(CommandExecutorRoute.class), responseTransformer);
 
         Spark.after("/login", repo.getBean(JsonContentTypeFilter.class));
         Spark.after("/data", repo.getBean(JsonContentTypeFilter.class));

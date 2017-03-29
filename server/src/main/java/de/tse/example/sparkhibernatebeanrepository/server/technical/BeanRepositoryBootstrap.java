@@ -2,16 +2,16 @@ package de.tse.example.sparkhibernatebeanrepository.server.technical;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tinosteinort.beanrepository.BeanRepository;
-import de.tse.example.sparkhibernatebeanrepository.server.functional.CreateDataRoute;
-import de.tse.example.sparkhibernatebeanrepository.server.functional.DeleteDataRoute;
-import de.tse.example.sparkhibernatebeanrepository.server.functional.GetDataRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.command.CreateDataCommandExecutor;
+import de.tse.example.sparkhibernatebeanrepository.server.command.DeleteDataCommandExecutor;
+import de.tse.example.sparkhibernatebeanrepository.server.command.GetDataCommandExecutor;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputInfoQueryService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.InputService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.LoginRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.PasswordHashService;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.PasswordService;
-import de.tse.example.sparkhibernatebeanrepository.server.functional.SearchDataRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.functional.UserService;
+import de.tse.example.sparkhibernatebeanrepository.server.technical.command.CommandExecutorPool;
 import org.hibernate.SessionFactory;
 
 public class BeanRepositoryBootstrap {
@@ -22,10 +22,11 @@ public class BeanRepositoryBootstrap {
         builder.singleton(DbService.class, DbService::new, SessionFactory.class)
                 .singleton(InputService.class, InputService::new, DbService.class)
                 .singleton(LoginRoute.class, LoginRoute::new, RequestUnmarshaller.class, JwtHandler.class, PasswordService.class)
-                .singleton(CreateDataRoute.class, CreateDataRoute::new)
-                .singleton(GetDataRoute.class, GetDataRoute::new)
-                .singleton(SearchDataRoute.class, SearchDataRoute::new)
-                .singleton(DeleteDataRoute.class, DeleteDataRoute::new)
+                .singleton(GetDataCommandExecutor.class, GetDataCommandExecutor::new, InputInfoQueryService.class)
+                .singleton(CreateDataCommandExecutor.class, CreateDataCommandExecutor::new, InputService.class, InputInfoQueryService.class)
+                .singleton(DeleteDataCommandExecutor.class, DeleteDataCommandExecutor::new, InputService.class)
+                .singleton(CommandExecutorRoute.class, CommandExecutorRoute::new, CommandExecutorPool.class)
+                .singleton(CommandExecutorPool.class, CommandExecutorPool::new, RequestUnmarshaller.class)
                 .singletonFactory(SessionFactory.class, SessionFactoryFactory::new)
                 .singleton(TransactionExecutor.class, TransactionExecutor::new)
                 .singleton(ContextExecutor.class, ContextExecutor::new)

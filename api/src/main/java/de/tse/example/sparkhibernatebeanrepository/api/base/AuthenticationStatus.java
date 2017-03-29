@@ -1,4 +1,4 @@
-package de.tse.example.sparkhibernatebeanrepository.api.to;
+package de.tse.example.sparkhibernatebeanrepository.api.base;
 
 public enum AuthenticationStatus {
 

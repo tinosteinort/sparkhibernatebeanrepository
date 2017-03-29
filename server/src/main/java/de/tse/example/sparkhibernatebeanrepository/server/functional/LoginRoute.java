@@ -1,7 +1,6 @@
 package de.tse.example.sparkhibernatebeanrepository.server.functional;
 
-import de.tse.example.sparkhibernatebeanrepository.api.to.AuthenticationStatus;
-import de.tse.example.sparkhibernatebeanrepository.server.functional.bo.UserBO;
+import de.tse.example.sparkhibernatebeanrepository.api.base.AuthenticationStatus;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.JwtHandler;
 import de.tse.example.sparkhibernatebeanrepository.server.technical.RequestUnmarshaller;
 import org.slf4j.Logger;
