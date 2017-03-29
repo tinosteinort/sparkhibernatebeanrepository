@@ -20,9 +20,9 @@ public class ClientApplication extends Application {
     @Override public void start(final Stage primaryStage) throws Exception {
 
         final Configuration config = new Configuration();
-        config.setTrustStore("certs/localhost-serverkeystore");
-        config.setTrustStorePassword("changeit".toCharArray());
-        config.setBaseUrl("https://localhost:8123");
+        config.setTrustStore(System.getProperty("truststore"));
+        config.setTrustStorePassword(System.getProperty("truststorePassword").toCharArray());
+        config.setBaseUrl(System.getProperty("baseUrl"));
 
         final BeanRepository repo = new BeanRepository.BeanRepositoryBuilder()
                 .instance(primaryStage)
