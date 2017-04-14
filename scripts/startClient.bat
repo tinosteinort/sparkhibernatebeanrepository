@@ -1,0 +1,1 @@
+javaw -Dtruststore= -DtruststorePassword= -DbaseUrl= -jar client-1.0-SNAPSHOT-assembly\client-1.0-SNAPSHOT-launcher.jar
