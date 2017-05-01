@@ -1,6 +1,7 @@
 package de.tse.example.sparkhibernatebeanrepository.server.routes;
 
 import de.tse.example.sparkhibernatebeanrepository.api.base.AuthenticationStatus;
+import de.tse.example.sparkhibernatebeanrepository.api.base.FormParams;
 import de.tse.example.sparkhibernatebeanrepository.server.services.PasswordService;
 import de.tse.example.sparkhibernatebeanrepository.server.base.JwtHandler;
 import de.tse.example.sparkhibernatebeanrepository.server.base.RequestUnmarshaller;
@@ -28,11 +29,12 @@ public class LoginRoute implements Route {
     }
 
     @Override public AuthenticationStatus handle(final Request request, final Response response) throws Exception {
-        final String namePasswordCombination = requestUnmarshaller.unmarshall(request, String.class);
-        final String[] credentials = credentials(namePasswordCombination);
 
-        final String name = credentials[0];
-        final String password = credentials[1];
+        // The Method 'request.body()' must not be called before request.queryParams() was
+        //  accessed, because queryParams could not be read after that. If 'request.body()'
+        //  was called, the values are NULL.
+        final String name = request.queryParams(FormParams.USERNAME);
+        final String password = request.queryParams(FormParams.PASSWORD);
 
         if (passwordService.credentialsAreValid(name, password)) {
             LOG.debug("User %s logged id", name);
@@ -40,9 +42,5 @@ public class LoginRoute implements Route {
             return AuthenticationStatus.AUTHENTICATED;
         }
         return AuthenticationStatus.NOT_AUTHENTICATED;
-    }
-
-    private String[] credentials(final String namePasswordCombination) {
-        return namePasswordCombination.split("\\:");
     }
 }

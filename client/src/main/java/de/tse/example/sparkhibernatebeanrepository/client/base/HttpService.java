@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -14,6 +16,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.List;
 
 public class HttpService {
 
@@ -42,12 +45,21 @@ public class HttpService {
     }
 
     public <R, P> R post(final String url, final P data, final Class<R> returnClass) throws IOException {
-        final HttpPost post = new HttpPost(url);
-
         final StringEntity postData = (data == null
                                         ? null
                                         : new StringEntity(objectMapper.writeValueAsString(data), CHARSET));
-        post.setEntity(postData);
+        return post(url, postData, returnClass);
+    }
+
+    public <R> R postForm(final String url, final List<NameValuePair> nameValuePairs, final Class<R> returnClass) throws IOException {
+        final UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairs);
+        return post(url, entity, returnClass);
+    }
+
+    private <R> R post(final String url, final HttpEntity postEntity, final Class<R> returnClass) throws IOException {
+        final HttpPost post = new HttpPost(url);
+
+        post.setEntity(postEntity);
 
         try (final CloseableHttpResponse response = httpClient.execute(post)) {
             validateStatusCode(response);

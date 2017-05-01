@@ -2,10 +2,15 @@ package de.tse.example.sparkhibernatebeanrepository.client.services;
 
 import com.github.tinosteinort.beanrepository.BeanAccessor;
 import de.tse.example.sparkhibernatebeanrepository.api.base.AuthenticationStatus;
+import de.tse.example.sparkhibernatebeanrepository.api.base.FormParams;
 import de.tse.example.sparkhibernatebeanrepository.client.base.HttpService;
 import de.tse.example.sparkhibernatebeanrepository.client.base.ServiceUrlProvider;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoginService {
 
@@ -19,15 +24,13 @@ public class LoginService {
 
     public AuthenticationStatus login(final String name, final String password) {
         try {
-            return httpService.post(urlProvider.provide(), namePasswordCombination(name, password), AuthenticationStatus.class);
+            final List<NameValuePair> credentials = new ArrayList<>(2);
+            credentials.add(new BasicNameValuePair(FormParams.USERNAME, name));
+            credentials.add(new BasicNameValuePair(FormParams.PASSWORD, password));
+            return httpService.postForm(urlProvider.provide(), credentials, AuthenticationStatus.class);
         }
         catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-    }
-
-    private String namePasswordCombination(final String name, final String password) {
-        // TODO transfer infos in other format. FormSubmit? Base64 encoded?
-        return name + ":" + password;
     }
 }
