@@ -2,22 +2,23 @@ package de.tse.example.sparkhibernatebeanrepository.server;
 
 import com.github.tinosteinort.beanrepository.BeanRepository;
 import de.tse.example.sparkhibernatebeanrepository.api.to.CreateInputTO;
-import de.tse.example.sparkhibernatebeanrepository.server.services.InputService;
-import de.tse.example.sparkhibernatebeanrepository.server.routes.LoginRoute;
-import de.tse.example.sparkhibernatebeanrepository.server.services.PasswordService;
-import de.tse.example.sparkhibernatebeanrepository.server.services.UserService;
-import de.tse.example.sparkhibernatebeanrepository.server.bo.UserBO;
 import de.tse.example.sparkhibernatebeanrepository.server.base.BeanRepositoryBootstrap;
-import de.tse.example.sparkhibernatebeanrepository.server.routes.CommandExecutorRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.base.Configuration;
 import de.tse.example.sparkhibernatebeanrepository.server.base.ContextExecutor;
 import de.tse.example.sparkhibernatebeanrepository.server.base.JsonContentTypeFilter;
 import de.tse.example.sparkhibernatebeanrepository.server.base.JsonResponseTransformer;
-import de.tse.example.sparkhibernatebeanrepository.server.routes.LoginValidationRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.base.MyExceptionHandler;
 import de.tse.example.sparkhibernatebeanrepository.server.base.RequestLogger;
 import de.tse.example.sparkhibernatebeanrepository.server.base.ResponseLogger;
-import de.tse.example.sparkhibernatebeanrepository.server.routes.TransactionDelegateRoute;
 import de.tse.example.sparkhibernatebeanrepository.server.base.TransactionExecutor;
+import de.tse.example.sparkhibernatebeanrepository.server.bo.UserBO;
+import de.tse.example.sparkhibernatebeanrepository.server.routes.CommandExecutorRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.routes.LoginRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.routes.LoginValidationRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.routes.TransactionDelegateRoute;
+import de.tse.example.sparkhibernatebeanrepository.server.services.InputService;
+import de.tse.example.sparkhibernatebeanrepository.server.services.PasswordService;
+import de.tse.example.sparkhibernatebeanrepository.server.services.UserService;
 import spark.Route;
 import spark.Spark;
 
@@ -28,7 +29,13 @@ public class Start {
     private final BeanRepository repo;
 
     public Start() {
-        this.repo = new BeanRepositoryBootstrap().bootstrap();
+        final Configuration configuration = new Configuration();
+        configuration.setKeystoreFile(System.getProperty("keystore"));
+        configuration.setKeystorePassword(System.getProperty("keystorePassword"));
+        configuration.setPort(Integer.valueOf(System.getProperty("port")));
+        configuration.setJwtPassword("M31_C0mpl1kaetet#Pathwhaat");
+
+        this.repo = new BeanRepositoryBootstrap().bootstrap(configuration);
     }
 
     public static void main(String[] args) throws Exception {
@@ -38,22 +45,19 @@ public class Start {
     public void start() throws Exception {
         generateData();
 
+        final Configuration config = repo.getBean(Configuration.class);
 
-        final String keystoreFile = System.getProperty("keystore");
-        final String keystorePassword = System.getProperty("keystorePassword");
-        final int port = Integer.valueOf(System.getProperty("port"));
-
-        Spark.port(port);
-        Spark.secure(keystoreFile, keystorePassword, null, null);
+        Spark.port(config.getPort());
+        Spark.secure(config.getKeystoreFile(), config.getKeystorePassword(), null, null);
 
         final JsonResponseTransformer responseTransformer = repo.getBean(JsonResponseTransformer.class);
 
         Spark.before(repo.getBean(RequestLogger.class));
         Spark.after(repo.getBean(ResponseLogger.class));
 
-        Spark.post("/login", withTransaction(LoginRoute.class), responseTransformer);
         Spark.post("/command/" + COMMAND_PARAM, withTransactionAndUser(CommandExecutorRoute.class), responseTransformer);
 
+        Spark.post("/login", withTransaction(LoginRoute.class), responseTransformer);
         Spark.after("/login", repo.getBean(JsonContentTypeFilter.class));
 
         Spark.exception(Exception.class, repo.getBean(MyExceptionHandler.class));

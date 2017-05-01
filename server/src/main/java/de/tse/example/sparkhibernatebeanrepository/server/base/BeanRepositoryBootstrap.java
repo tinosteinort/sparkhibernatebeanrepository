@@ -41,7 +41,7 @@ public class BeanRepositoryBootstrap {
         builder.singleton(JsonContentTypeFilter.class, JsonContentTypeFilter::new);
         builder.singleton(RequestLogger.class, RequestLogger::new);
         builder.singleton(ResponseLogger.class, ResponseLogger::new);
-        builder.singleton(JwtPasswordProvider.class, () -> new JwtPasswordProvider("M31_C0mpl1kaetet#Pathwhaat"));
+        builder.singleton(JwtPasswordProvider.class, JwtPasswordProvider::new, Configuration.class);
         builder.singleton(JwtHandler.class, JwtHandler::new, JwtPasswordProvider.class);
     }
 
@@ -66,8 +66,9 @@ public class BeanRepositoryBootstrap {
 
     }
 
-    public BeanRepository bootstrap() {
+    public BeanRepository bootstrap(final Configuration configuration) {
         registerBeans();
+        builder.instance(configuration);
         return builder.build();
     }
 }

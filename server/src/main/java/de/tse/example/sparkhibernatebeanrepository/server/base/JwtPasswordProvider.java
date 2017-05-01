@@ -5,11 +5,11 @@ import com.github.tinosteinort.beanrepository.PostConstructible;
 
 public class JwtPasswordProvider implements PostConstructible {
 
-    private final String password;
+    private final Configuration configuration;
     private byte[] passwordAsBytes;
 
-    public JwtPasswordProvider(final String password) {
-        this.password = password;
+    public JwtPasswordProvider(final Configuration configuration) {
+        this.configuration = configuration;
     }
 
     public byte[] password() {
@@ -17,6 +17,6 @@ public class JwtPasswordProvider implements PostConstructible {
     }
 
     @Override public void onPostConstruct(final BeanRepository beanRepository) {
-        passwordAsBytes = password.getBytes();
+        passwordAsBytes = configuration.getJwtPassword().getBytes();
     }
 }

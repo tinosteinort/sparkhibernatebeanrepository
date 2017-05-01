@@ -12,8 +12,11 @@ public class JwtHandlerTest {
     private JwtHandler jwtHandler;
 
     @Before public void setup() {
+        final Configuration config = new Configuration();
+        config.setJwtPassword("MockPassword");
         final BeanRepository repo = new BeanRepository.BeanRepositoryBuilder()
-                .singleton(JwtPasswordProvider.class, () -> new JwtPasswordProvider("MockPassword"))
+                .instance(config)
+                .singleton(JwtPasswordProvider.class, JwtPasswordProvider::new, Configuration.class)
                 .singleton(JwtHandler.class, JwtHandler::new, JwtPasswordProvider.class)
                 .build();
         jwtHandler = repo.getBean(JwtHandler.class);
