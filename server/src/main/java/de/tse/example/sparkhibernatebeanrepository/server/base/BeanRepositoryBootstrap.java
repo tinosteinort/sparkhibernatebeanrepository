@@ -29,6 +29,7 @@ public class BeanRepositoryBootstrap {
     }
 
     private void registerTechnicalBeans() {
+        builder.singleton(SparkWrapper.class, SparkWrapper::new);
         builder.singleton(CommandExecutorPool.class, CommandExecutorPool::new, RequestUnmarshaller.class);
         builder.singletonFactory(SessionFactory.class, SessionFactoryFactory::new);
         builder.singleton(TransactionExecutor.class, TransactionExecutor::new);
