@@ -27,7 +27,7 @@
         <versions.h2>1.4.193</versions.h2>
         <versions.spark-core>2.5</versions.spark-core>
         <versions.httpcomponents-httpclient>4.5.2</versions.httpcomponents-httpclient>
-        <versions.jackson-databind>2.8.5</versions.jackson-databind>
+        <versions.jackson-databind>2.9.7</versions.jackson-databind>
         <version.maven-assembly-plugin>2.6</version.maven-assembly-plugin>
         <version.maven-jar-plugin>3.0.2</version.maven-jar-plugin>
         <version.jjwt>0.7.0</version.jjwt>
