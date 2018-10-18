@@ -21,7 +21,7 @@
         <version.maven-compiler-plugin>3.5.1</version.maven-compiler-plugin>
         <version.versions-maven-plugin>2.2</version.versions-maven-plugin>
         <version.beanrepository>1.5.1</version.beanrepository>
-        <version.spark-core>2.5</version.spark-core>
+        <version.spark-core>2.5.2</version.spark-core>
         <versions.slf4j-simple>1.7.21</versions.slf4j-simple>
         <versions.hibernate-core>5.2.5.Final</versions.hibernate-core>
         <versions.h2>1.4.193</versions.h2>
